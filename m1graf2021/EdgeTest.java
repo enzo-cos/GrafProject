@@ -75,4 +75,16 @@ class EdgeTest {
         Assert.assertTrue(n22.equals(n2));
         Assert.assertTrue(n4.equals(n4));
     }
+
+    @Test
+    void testEdgeWeight() {
+        Edge e1=new Edge(1,2,7);
+        Edge e2=new Edge(1,2);
+        Edge e3=new Edge(1,2,null);
+        Edge e4=new Edge(1,2,17);
+        System.out.println(e1);
+        System.out.println(e2);
+        System.out.println(e3);System.out.println(e4);
+
+    }
 }

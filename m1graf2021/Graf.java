@@ -91,7 +91,12 @@ public class Graf {
                                 int ind=str_2.indexOf("[");
                                 Integer to=Integer.parseInt(str_2.substring(0,ind).trim());
                                 String len=str_2.split("=")[1].trim();
-                                len=len.substring(0,len.indexOf(",")).trim();
+                                int ind_virg=len.indexOf(",");
+                                if(ind_virg==-1){
+                                    len = len.substring(0, len.indexOf("]")).trim();
+                                }else {
+                                    len = len.substring(0, ind_virg).trim();
+                                }
                                 Integer weight=Integer.parseInt(len);
                                 Edge e=new Edge(nb,to,weight);
                                 this.addEdge(e);

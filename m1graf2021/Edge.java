@@ -117,6 +117,9 @@ public class Edge implements Comparable<Edge>{
      * @return String : (from,to)
      */
     public String toString() {
-        return String.format(this.from+"->"+this.to);
+        if(weight!=null) {
+            return String.format(this.from + "->" + this.to+"("+this.weight+")");
+        }
+        return String.format(this.from + "->" + this.to);
     }
 }
