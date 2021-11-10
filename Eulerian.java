@@ -1,4 +1,7 @@
 import m1graf2021.*;
+
+import java.io.File;
+
 /******************************
  *****     PW3 PROJECT   ******
  *****************************/
@@ -8,6 +11,23 @@ public class Eulerian {
     public Eulerian(){
         graf=new Graf();
     }
+
+    /**
+     * Constructor from Dot File
+     * @param f File
+     */
+    public Eulerian(File f){
+        graf=new UndirectedGraf(f);
+    }
+
+    /**
+     * Getter of graf
+     * @return graf
+     */
+    public Graf getGraf() {
+        return graf;
+    }
+
     /**
      * Know if a graf is eulerian
      * @return 0 if Eulerian
