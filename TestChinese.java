@@ -2,8 +2,24 @@ import org.junit.Assert;
 import org.junit.jupiter.api.Test;
 
 import java.io.File;
+import m1graf2021.*;
 
 public class TestChinese {
+
+    @Test
+    public void testPair(){
+        Pair<Integer,Boolean> p=new Pair<>(4,true);
+        Assert.assertEquals((Integer) 4,p.getFirst());
+        Assert.assertEquals(true,p.getSecond());
+        p.setValue(8,false);
+        Assert.assertEquals((Integer) 8,p.getFirst());
+        Assert.assertEquals(false,p.getSecond());
+        Assert.assertEquals(p,p.getValue());
+        Pair<Node,Edge> p2=new Pair<>(new Node(1),new Edge(1,2));
+        Assert.assertEquals(1,p2.getFirst().getId());
+        Assert.assertEquals(2,p2.getSecond().to().getId());
+    }
+
     @Test
     void testEulerianGraf(){
         /*
@@ -33,6 +49,10 @@ public class TestChinese {
         Assert.assertEquals(-1,graf.isEulerian());
 
         f=new File("myGraf.gv");
+        graf=new ChinesePostman(f);
+        System.out.println(graf.toDotString());
+
+        f=new File("src/exempleFinal");
         graf=new ChinesePostman(f);
         System.out.println(graf.toDotString());
     }
