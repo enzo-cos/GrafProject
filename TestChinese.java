@@ -56,4 +56,33 @@ public class TestChinese {
         graf=new ChinesePostman(f);
         System.out.println(graf.toDotString());
     }
+
+    @Test
+    public void testchineseproductEulerian(){
+        File f=new File("Eulerian.gv");
+        UndirectedGraf g=new UndirectedGraf();
+        ChinesePostman graf=new ChinesePostman(f);
+        System.out.println(graf.toDotString());
+        System.out.println(graf.getEulerianCircuit());
+        //123453241
+        f=new File("src/Eulerian2.gv");
+        graf=new ChinesePostman(f);
+        System.out.println(graf.toDotString());
+        System.out.println(graf.getEulerianCircuit());
+    }
+
+    @Test
+    public void testchineseproductSemiEuleurian(){
+        File f=new File("semi-Eulerian.gv");
+        UndirectedGraf g=new UndirectedGraf();
+        ChinesePostman graf=new ChinesePostman(f);
+        Node n= graf.getMinNodeOdd();
+        System.out.println(graf.getSemiEulerianCircuit(n));
+        //
+        f=new File("src/semi-Eulerian2.gv");
+        graf=new ChinesePostman(f);
+        n= graf.getMinNodeOdd();
+        System.out.println(graf.getSemiEulerianCircuit(n));
+        //// 3 2 1 4 5 2 7 3 5 7 6 4
+    }
 }

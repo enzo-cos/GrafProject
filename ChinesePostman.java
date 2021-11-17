@@ -4,6 +4,7 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.lang.reflect.UndeclaredThrowableException;
 import java.util.*;
 
 /******************************
@@ -144,6 +145,11 @@ public class ChinesePostman {
             System.err.println("Error while reading file.");
         }
     }
+
+    /**
+     * Obtain Dot Format of the graph
+     * @return Dot Format
+     */
     public String toDotString(){
         String str="";
         str+="graph {\n";
@@ -253,6 +259,138 @@ public class ChinesePostman {
         //if(nbOddDegree>2) return -1;//Not Eulerian
         return -1;
     }
+
+    /**
+     * Get the smallest of the node
+     * @param n Node we are looking for his smallest successor
+     * @param g copy of the graf
+     * @return node
+     */
+    public Node getMinSuccessor(Node n, UndirectedGraf g){
+        List<Node> list=g.getSuccessors(n);
+        int i=0;
+        Node node=null;
+        if(list.size()<1) return null;
+        node=list.get(0);
+        for(Node n1 : list){
+            if(n1.getId()< node.getId()){
+                node=n1;
+            }
+        }
+        return node;
+    }
+
+    /**
+     * Obtain Eulerian circuit from a graf
+     * @return list Eulerian Circuit
+     */
+    public List<Node> getEulerianCircuit(){
+        UndirectedGraf g=graf;
+        List<Edge> listEdges=g.getAllEdges();
+        List<Node> list=new LinkedList<>();
+        Node nfirst=graf.getNode(1);
+        list.add(nfirst);
+        Node n=nfirst;
+        Node nmin = this.getMinSuccessor(n, g);
+        //System.err.println(nmin);
+        int ind=-1;
+        while(nmin!=null) {
+            if(ind!= -1) ind++;
+            g.removeEdge(n, nmin);
+            n = nmin;
+            nmin = this.getMinSuccessor(n, g);
+            if(nmin==null){
+                if(ind==-1){
+                    list.add(n);
+                }else{
+                    list.add(ind,n);
+                }
+                boolean b=true;
+                for(Node n2 : list){
+                    Node ncurr=this.getMinSuccessor(n2,g);
+                    if(ncurr!=null){
+                        b=false;
+                        g.removeEdge(n2, ncurr);
+                        n=ncurr;
+                        ind=list.indexOf(n2)+1;
+                        break;
+                    }
+                }
+                if(b) break;
+                nmin = this.getMinSuccessor(n, g);
+               // list.add(nmin);
+            }
+            if(ind==-1){
+                list.add(n);
+            }else{
+                list.add(ind,n);
+            }
+
+        }
+        return list;
+    }
+
+    public Node getMinNodeOdd(){
+        List<Node> list_impair=new ArrayList<>();
+            List<Node> list=graf.getAllNodes();
+            for(Node node : list){
+                if(graf.degree(node)%2!=0){
+                    list_impair.add(node);
+                }
+            }
+            Collections.sort(list_impair);
+        return list_impair.get(0);
+    }
+    /**
+     * Obtain Eulerian circuit from a graf
+     * @return list Eulerian Circuit
+     */
+    public List<Node> getSemiEulerianCircuit(Node nfirst){
+        UndirectedGraf g=graf;
+        List<Edge> listEdges=g.getAllEdges();
+        List<Node> list=new LinkedList<>();
+        //Node nfirst=nf;
+        list.add(nfirst);
+        Node n=nfirst;
+        Node nmin = this.getMinSuccessor(n, g);
+        //System.err.println(nmin);
+        int ind=-1;
+        while(nmin!=null) {
+            if(ind!= -1) ind++;
+            g.removeEdge(n, nmin);
+            n = nmin;
+            nmin = this.getMinSuccessor(n, g);
+            if(nmin==null){
+                if(ind==-1){
+                    list.add(n);
+                }else{
+                    list.add(ind,n);
+                }
+                boolean b=true;
+                for(Node n2 : list){
+                    Node ncurr=this.getMinSuccessor(n2,g);
+                    if(ncurr!=null){
+                        b=false;
+                        g.removeEdge(n2, ncurr);
+                        n=ncurr;
+                        ind=list.indexOf(n2)+1;
+                        break;
+                    }
+                }
+                if(b) break;
+                nmin = this.getMinSuccessor(n, g);
+                // list.add(nmin);
+            }
+            if(ind==-1){
+                list.add(n);
+            }else{
+                list.add(ind,n);
+            }
+
+        }
+        return list;
+    }
+
 
     /**
      * Retourner le DotFile

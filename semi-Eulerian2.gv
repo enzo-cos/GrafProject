@@ -1,0 +1,13 @@
+graph {
+	1 -- 2[len=2,label=2];
+	1 -- 4[len=2,label=2];
+	2 -- 3[len=2,label=2];
+	2 -- 5[len=2,label=2];
+	3 -- 5[len=2,label=2];
+	5 -- 4[len=2,label=2];
+	4 -- 6[len=2,label=2];
+	3 -- 7[len=2,label=2];
+	2 -- 7[len=2,label=2];
+	6 -- 7[len=2,label=2];
+	7 -- 5[len=2,label=2];
+}
