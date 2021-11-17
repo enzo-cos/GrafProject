@@ -286,50 +286,60 @@ public class ChinesePostman {
      */
     public List<Node> getEulerianCircuit(){
         UndirectedGraf g=graf;
-        List<Edge> listEdges=g.getAllEdges();
         List<Node> list=new LinkedList<>();
-        Node nfirst=graf.getNode(1);
-        list.add(nfirst);
-        Node n=nfirst;
-        Node nmin = this.getMinSuccessor(n, g);
-        //System.err.println(nmin);
+        Node n=g.getNode(1);
         int ind=-1;
-        while(nmin!=null) {
-            if(ind!= -1) ind++;
-            g.removeEdge(n, nmin);
-            n = nmin;
-            nmin = this.getMinSuccessor(n, g);
-            if(nmin==null){
-                if(ind==-1){
-                    list.add(n);
-                }else{
-                    list.add(ind,n);
-                }
-                boolean b=true;
-                for(Node n2 : list){
-                    Node ncurr=this.getMinSuccessor(n2,g);
-                    if(ncurr!=null){
-                        b=false;
-                        g.removeEdge(n2, ncurr);
-                        n=ncurr;
-                        ind=list.indexOf(n2)+1;
-                        break;
-                    }
-                }
-                if(b) break;
-                nmin = this.getMinSuccessor(n, g);
-               // list.add(nmin);
-            }
-            if(ind==-1){
-                list.add(n);
-            }else{
-                list.add(ind,n);
-            }
+        return getEulerian_rec(n,list,g,ind);
+    }
 
+    /**
+     * Récursive Algorithme to get semiEulerianCircuit
+     * @param n Current visited Node
+     * @param list Eulerian Circuit
+     * @param g Copy of the graf
+     * @param ind Indice to add a node into the list
+     * @return Eulerian Circuit
+     */
+    private List<Node> getEulerian_rec(Node n,List<Node> list,UndirectedGraf g,int ind){
+        if(ind==-1){
+            list.add(n);
+        }else{
+            list.add(ind,n);
         }
+        if(ind!= -1) ind++;
+        Node nmin=getMinSuccessor(n,g);
+        if(nmin==null){
+            for(Node n2 : list){
+                Node ncurr=this.getMinSuccessor(n2,g);
+                if(ncurr!=null){
+                    g.removeEdge(n2, ncurr);
+                    n=ncurr;
+                    ind=list.indexOf(n2)+1;
+                    list=getEulerian_rec(n,list,g,ind);
+                    break;
+                }
+            }
+        }else{
+            g.removeEdge(n,nmin);
+            list=getEulerian_rec(nmin,list,g,ind);
+        }
+
         return list;
     }
 
+    /**
+     * Obtain Eulerian circuit from a graf
+     * @return list Eulerian Circuit
+     */
+    public List<Node> getSemiEulerianCircuit(Node nfirst){
+        UndirectedGraf g = (UndirectedGraf) graf.getGraf();
+        return getEulerian_rec(nfirst,new LinkedList<>(),g,-1);
+    }
+
+    /**
+     * Get the minimal Odd node of the graf
+     * @return Minimum Odd Node
+     */
     public Node getMinNodeOdd(){
         List<Node> list_impair=new ArrayList<>();
             List<Node> list=graf.getAllNodes();
@@ -340,55 +350,6 @@ public class ChinesePostman {
             }
             Collections.sort(list_impair);
         return list_impair.get(0);
-    }
-    /**
-     * Obtain Eulerian circuit from a graf
-     * @return list Eulerian Circuit
-     */
-    public List<Node> getSemiEulerianCircuit(Node nfirst){
-        UndirectedGraf g=graf;
-        List<Edge> listEdges=g.getAllEdges();
-        List<Node> list=new LinkedList<>();
-        //Node nfirst=nf;
-        list.add(nfirst);
-        Node n=nfirst;
-        Node nmin = this.getMinSuccessor(n, g);
-        //System.err.println(nmin);
-        int ind=-1;
-        while(nmin!=null) {
-            if(ind!= -1) ind++;
-            g.removeEdge(n, nmin);
-            n = nmin;
-            nmin = this.getMinSuccessor(n, g);
-            if(nmin==null){
-                if(ind==-1){
-                    list.add(n);
-                }else{
-                    list.add(ind,n);
-                }
-                boolean b=true;
-                for(Node n2 : list){
-                    Node ncurr=this.getMinSuccessor(n2,g);
-                    if(ncurr!=null){
-                        b=false;
-                        g.removeEdge(n2, ncurr);
-                        n=ncurr;
-                        ind=list.indexOf(n2)+1;
-                        break;
-                    }
-                }
-                if(b) break;
-                nmin = this.getMinSuccessor(n, g);
-                // list.add(nmin);
-            }
-            if(ind==-1){
-                list.add(n);
-            }else{
-                list.add(ind,n);
-            }
-
-        }
-        return list;
     }
 
 

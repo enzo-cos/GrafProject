@@ -2,6 +2,8 @@ import org.junit.Assert;
 import org.junit.jupiter.api.Test;
 
 import java.io.File;
+import java.util.List;
+
 import m1graf2021.*;
 
 public class TestChinese {
@@ -22,17 +24,7 @@ public class TestChinese {
 
     @Test
     void testEulerianGraf(){
-        /*
-        1 -- 2[len=2,label=2];
-        1 -- 4[len=2,label=2];
-        2 -- 3[len=3,label=3];
-        3 -- 2[len=1,label=1];
-        3 -- 4[len=4,label=4];
-        4 -- 5[len=6,label=6];
-        5 -- 3[len=2,label=2];
-         */
         File f=new File("semi-Eulerian.gv");
-        ChinesePostman testgraf=new ChinesePostman();
         ChinesePostman graf=new ChinesePostman(f);
         //4 et 2
         System.out.println(graf.getGraf().toDotString());
@@ -59,30 +51,61 @@ public class TestChinese {
 
     @Test
     public void testchineseproductEulerian(){
-        File f=new File("Eulerian.gv");
+        File f=new File("src/Eulerian.gv");
         UndirectedGraf g=new UndirectedGraf();
         ChinesePostman graf=new ChinesePostman(f);
         System.out.println(graf.toDotString());
-        System.out.println(graf.getEulerianCircuit());
-        //123453241
+        int[] expect={1,2,3,4,5,3,2,4,1};
+        List<Node> list=graf.getEulerianCircuit();
+        System.out.println(list);
+        int i=0;
+        for(Node n : list){
+            Assert.assertEquals(expect[i],n.getId());
+            i++;
+        }
+        //1 2 3 4 5 3 2 4 1
         f=new File("src/Eulerian2.gv");
         graf=new ChinesePostman(f);
         System.out.println(graf.toDotString());
-        System.out.println(graf.getEulerianCircuit());
+        int[]expect2={1,2,3,6,5,7,8,9,10,8,6,2,4,1,4,5,1};
+        list=graf.getEulerianCircuit();
+        System.out.println(list);
+        i=0;
+        for(Node n : list){
+            Assert.assertEquals(expect2[i],n.getId());
+            i++;
+        }
+        // 1 2 3 6 5 7 8 9 10 8 6 2 4 1 4 5 1
     }
 
     @Test
     public void testchineseproductSemiEuleurian(){
-        File f=new File("semi-Eulerian.gv");
+        File f=new File("src/semi-Eulerian.gv");
         UndirectedGraf g=new UndirectedGraf();
         ChinesePostman graf=new ChinesePostman(f);
         Node n= graf.getMinNodeOdd();
-        System.out.println(graf.getSemiEulerianCircuit(n));
-        //
+        int[] expect={2,1,4,3,2,3,5,4};
+        List<Node> list=graf.getSemiEulerianCircuit(n);
+        System.out.println(list);
+        int i=0;
+        for(Node node : list){
+            Assert.assertEquals(expect[i],node.getId());
+            i++;
+        }
+        // 2 1 4 3 2 3 5 4
+
         f=new File("src/semi-Eulerian2.gv");
         graf=new ChinesePostman(f);
         n= graf.getMinNodeOdd();
-        System.out.println(graf.getSemiEulerianCircuit(n));
-        //// 3 2 1 4 5 2 7 3 5 7 6 4
+        int[] expect2={3,2,1,4,5,2,7,3,5,7,6,4};
+        list=graf.getSemiEulerianCircuit(n);
+        System.out.println(list);
+        i=0;
+        for(Node node : list){
+            Assert.assertEquals(expect2[i],node.getId());
+            i++;
+        }
+        // 3 2 1 4 5 2 7 3 5 7 6 4
     }
+
 }
