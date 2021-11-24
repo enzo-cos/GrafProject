@@ -352,6 +352,88 @@ public class ChinesePostman {
         return list_impair.get(0);
     }
 
+    public Edge getMinEdge(Node n1, Node n2,List<Edge> list_edge){
+        List<Edge> list=new ArrayList<>();
+        list.addAll(list_edge);
+        Edge e=new Edge(n1,n2);
+        if(e.from().getId()>e.to().getId()) e=e.getSymmetric();
+        int k=list.indexOf(e);
+        if(k!=-1){
+            e=list.remove(k);
+        }else{
+            return null;
+        }
+        k=list.indexOf(e);
+        while(k!=-1){
+            Edge curr=list.remove(k);
+            if(curr.getWeight()<e.getWeight()){
+                e=curr;
+            }
+            k=list.indexOf(e);
+        }
+
+        return e;
+    }
+
+    /**
+     * Compute the shortest path between two Nodes
+     */
+    public int[][] Floyd_Warshall(){
+        Map<Pair<Node,Node>,Integer> map=new HashMap<>();
+        List<Node> list_node=graf.getAllNodes();
+        List<Edge> list_edge=graf.getAllEdges();
+        Node[][] pred=new Node[list_node.size()+1][list_node.size()+1];
+        int[][] mat=new int[list_node.size()+1][list_node.size()+1];
+        for(Node n1 : list_node){
+            for(Node n2 : list_node){
+                if(n1.equals(n2)){
+                    map.put(new Pair<>(n1,n2),0);
+                    mat[n1.getId()][n2.getId()]=0;
+                    pred[n1.getId()][n2.getId()]=n1;
+                }else{
+                    //Comparer les multi edges et prendre le plus petit
+
+                    //Edge e = new Edge(n1,n2);
+                    /*if(list_edge.contains(e) || list_edge.contains(e.getSymmetric())){
+                        if(list_edge.contains(e)) {
+                            e = list_edge.get(list_edge.indexOf(e));
+                        }else if(list_edge.contains(e.getSymmetric())) {
+                            e = list_edge.get(list_edge.indexOf(e.getSymmetric()));
+                        }*/
+                    //System.err.println(list_edge);
+                    Edge e=getMinEdge(n1,n2,list_edge);
+                    //System.err.println(list_edge);
+                    if(e!=null){
+                        map.put(new Pair<>(n1,n2),e.getWeight());
+                        mat[n1.getId()][n2.getId()]=e.getWeight();
+                        pred[n1.getId()][n2.getId()]=n1;
+                    }else{
+                        map.put(new Pair<>(n1,n2),-1);
+                        mat[n1.getId()][n2.getId()]=-1;
+                    }
+                }
+            }
+        }
+        for(Node x : list_node) {
+            for (Node y : list_node) {
+                for (Node z : list_node) {
+                    //System.err.println(" pair : "+(new Pair<>(x,z))+"map "+map.get(new Pair<>(x,z)));
+                    /*int nb=(map.get(new Pair<>(x,z)) + map.get(new Pair<>(z,y)));
+                    if(map.get(new Pair<>(x,z))!=-1 && map.get(new Pair<>(y,z))!=-1 && (nb< map.get(new Pair<>(x,y)))){
+                        map.replace(new Pair<>(x,y),nb);
+                        pred[x.getId()][y.getId()]=pred[z.getId()][y.getId()];
+                    }*/
+                    int nb=(mat[x.getId()][z.getId()] + mat[z.getId()][y.getId()]);
+                    if(mat[x.getId()][z.getId()]!=-1 && mat[z.getId()][y.getId()]!=-1 && (nb< mat[x.getId()][y.getId()] || mat[x.getId()][y.getId()]<0)){
+                        mat[x.getId()][y.getId()]=nb;
+                        map.replace(new Pair<>(x,y),nb);
+                        pred[x.getId()][y.getId()]=pred[z.getId()][y.getId()];
+                    }
+                }
+            }
+        }
+        return mat;
+    }
 
     /**
      * Retourner le DotFile

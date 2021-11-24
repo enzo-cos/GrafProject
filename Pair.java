@@ -1,3 +1,5 @@
+import m1graf2021.Edge;
+
 class Pair<T1,T2> {
     private T1 first;
     private T2 second;
@@ -47,4 +49,23 @@ class Pair<T1,T2> {
     public T2 getSecond() {
         return second;
     }
+
+
+    @Override
+    public String toString(){
+        return ("("+this.first.toString()+","+this.second.toString()+")");
+    }
+
+  /*  @Override
+    public int compareTo(Pair pair) {
+        return 0;
+    }
+
+    @Override
+    public boolean equals(Object obj){
+        if(obj==null) return false;
+        if(!(obj instanceof Pair) ) return false;
+        Pair p=(Pair) obj;
+        return this.first.equals(p.first) && this.second.equals(p.second);
+    }*/
 }

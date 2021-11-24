@@ -2,6 +2,7 @@ import org.junit.Assert;
 import org.junit.jupiter.api.Test;
 
 import java.io.File;
+import java.util.Arrays;
 import java.util.List;
 
 import m1graf2021.*;
@@ -106,6 +107,26 @@ public class TestChinese {
             i++;
         }
         // 3 2 1 4 5 2 7 3 5 7 6 4
+    }
+
+    @Test
+    public void testtest(){
+        UndirectedGraf g=new UndirectedGraf();
+        File f=new File("src/Eulerian.gv");
+        ChinesePostman graf=new ChinesePostman(f);
+        //System.out.println(graf.Floyd_Warshall().toString());
+
+        //1,2 = 2   1,3 = 3  1,4 = 2    1,5 = 5
+        //2,3 = 1   2,4 = 1   2,5 = 3
+        // 3,4 = 2   3,5 2
+        // 4,5 = 4
+        int [][] m =graf.Floyd_Warshall();
+        for(int[] a : m)
+        System.out.println(Arrays.toString(a));
+        //1,2 = 2   1,3 = 5  1,4 = 2    1,5 = 7
+        //2,3 = 3   2,4 = 1   2,5 = 5
+        // 3,4 = 4   3,5 2
+        // 4,5 = 6
     }
 
 }
