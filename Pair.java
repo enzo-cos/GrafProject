@@ -53,12 +53,18 @@ class Pair<T1,T2> {
 
     @Override
     public String toString(){
+        if(this.second==null) return ("("+this.first.toString()+", null)");
         return ("("+this.first.toString()+","+this.second.toString()+")");
     }
 
-  /*  @Override
+    /*@Override
     public int compareTo(Pair pair) {
         return 0;
+    }*/
+
+    @Override
+    public int hashCode() {
+        return this.toString().hashCode();
     }
 
     @Override
@@ -67,5 +73,5 @@ class Pair<T1,T2> {
         if(!(obj instanceof Pair) ) return false;
         Pair p=(Pair) obj;
         return this.first.equals(p.first) && this.second.equals(p.second);
-    }*/
+    }
 }

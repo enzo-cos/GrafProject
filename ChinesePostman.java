@@ -378,8 +378,9 @@ public class ChinesePostman {
     /**
      * Compute the shortest path between two Nodes
      */
-    public int[][] Floyd_Warshall(){
-        Map<Pair<Node,Node>,Integer> map=new HashMap<>();
+    //Map<Pair<Node,Node>,Pair<Integer,Node>>
+    public Map<Pair<Node,Node>,Pair<Integer,Node>> Floyd_Warshall(){
+        Map<Pair<Node,Node>,Pair<Integer,Node>> map=new HashMap<>();
         List<Node> list_node=graf.getAllNodes();
         List<Edge> list_edge=graf.getAllEdges();
         Node[][] pred=new Node[list_node.size()+1][list_node.size()+1];
@@ -387,7 +388,7 @@ public class ChinesePostman {
         for(Node n1 : list_node){
             for(Node n2 : list_node){
                 if(n1.equals(n2)){
-                    map.put(new Pair<>(n1,n2),0);
+                    map.put(new Pair<>(n1,n2),new Pair<>(0,null));
                     mat[n1.getId()][n2.getId()]=0;
                     pred[n1.getId()][n2.getId()]=n1;
                 }else{
@@ -404,11 +405,11 @@ public class ChinesePostman {
                     Edge e=getMinEdge(n1,n2,list_edge);
                     //System.err.println(list_edge);
                     if(e!=null){
-                        map.put(new Pair<>(n1,n2),e.getWeight());
+                        map.put(new Pair<>(n1,n2),new Pair<>(e.getWeight(),null));
                         mat[n1.getId()][n2.getId()]=e.getWeight();
                         pred[n1.getId()][n2.getId()]=n1;
                     }else{
-                        map.put(new Pair<>(n1,n2),-1);
+                        map.put(new Pair<>(n1,n2),new Pair<>(-1,null));
                         mat[n1.getId()][n2.getId()]=-1;
                     }
                 }
@@ -426,14 +427,47 @@ public class ChinesePostman {
                     int nb=(mat[x.getId()][z.getId()] + mat[z.getId()][y.getId()]);
                     if(mat[x.getId()][z.getId()]!=-1 && mat[z.getId()][y.getId()]!=-1 && (nb< mat[x.getId()][y.getId()] || mat[x.getId()][y.getId()]<0)){
                         mat[x.getId()][y.getId()]=nb;
-                        map.replace(new Pair<>(x,y),nb);
+                        //System.err.println(map.get(new Pair<>(x,y)));
+                        map.replace(new Pair<>(x,y),new Pair<>(nb,z));
                         pred[x.getId()][y.getId()]=pred[z.getId()][y.getId()];
                     }
                 }
             }
         }
-        return mat;
+        for(int[] a : mat)
+            System.out.println(Arrays.toString(a));
+        return map;
     }
+
+    public List<Pair<Node,Node>> getListPair(int [][]mat){
+        List<Node> list_impair=new ArrayList<>();
+        List<Pair<Node,Node>> list_final=new ArrayList<>();
+
+        List<Pair<Node,Node>> list_Pair=new ArrayList<>();
+
+        List<Node> list=graf.getAllNodes();
+        for(Node node : list){
+            if(graf.degree(node)%2!=0){
+                list_impair.add(node);
+            }
+        }
+        Collections.sort(list_impair);
+        /*for(Node n1 : list_impair){
+            for(Node n2 : list_impair){
+                if(n1.equals(n2) || n1.getId() < n2.getId()) continue;
+                Pair p=new Pair(n1,n2);
+                list_Pair.add(p);
+            }
+        }*/
+        for(int i=0;i<list_impair.size();i+=2) {
+            Pair p = new Pair(list_impair.get(i), list_impair.get(i+1));
+            list_final.add(p);
+        }
+
+        return list_final;
+    }
+
+
 
     /**
      * Retourner le DotFile
