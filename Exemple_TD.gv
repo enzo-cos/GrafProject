@@ -1,4 +1,4 @@
-graf{
+graph {
     1--2 [label=3, len=3]
     1--5 [label=2, len=2]
     2--3 [label=16, len=16]

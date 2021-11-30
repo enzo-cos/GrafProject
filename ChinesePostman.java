@@ -380,6 +380,7 @@ public class ChinesePostman {
      */
     //Map<Pair<Node,Node>,Pair<Integer,Node>>
     public Map<Pair<Node,Node>,Pair<Integer,Node>> Floyd_Warshall(){
+        final int INF=(int)Double.POSITIVE_INFINITY - 10000000;
         Map<Pair<Node,Node>,Pair<Integer,Node>> map=new HashMap<>();
         List<Node> list_node=graf.getAllNodes();
         List<Edge> list_edge=graf.getAllEdges();
@@ -393,24 +394,14 @@ public class ChinesePostman {
                     pred[n1.getId()][n2.getId()]=n1;
                 }else{
                     //Comparer les multi edges et prendre le plus petit
-
-                    //Edge e = new Edge(n1,n2);
-                    /*if(list_edge.contains(e) || list_edge.contains(e.getSymmetric())){
-                        if(list_edge.contains(e)) {
-                            e = list_edge.get(list_edge.indexOf(e));
-                        }else if(list_edge.contains(e.getSymmetric())) {
-                            e = list_edge.get(list_edge.indexOf(e.getSymmetric()));
-                        }*/
-                    //System.err.println(list_edge);
                     Edge e=getMinEdge(n1,n2,list_edge);
-                    //System.err.println(list_edge);
                     if(e!=null){
                         map.put(new Pair<>(n1,n2),new Pair<>(e.getWeight(),null));
                         mat[n1.getId()][n2.getId()]=e.getWeight();
                         pred[n1.getId()][n2.getId()]=n1;
                     }else{
-                        map.put(new Pair<>(n1,n2),new Pair<>(-1,null));
-                        mat[n1.getId()][n2.getId()]=-1;
+                        map.put(new Pair<>(n1,n2),new Pair<>(INF,null));
+                        mat[n1.getId()][n2.getId()]=INF;
                     }
                 }
             }
@@ -418,28 +409,22 @@ public class ChinesePostman {
         for(Node x : list_node) {
             for (Node y : list_node) {
                 for (Node z : list_node) {
-                    //System.err.println(" pair : "+(new Pair<>(x,z))+"map "+map.get(new Pair<>(x,z)));
-                    /*int nb=(map.get(new Pair<>(x,z)) + map.get(new Pair<>(z,y)));
-                    if(map.get(new Pair<>(x,z))!=-1 && map.get(new Pair<>(y,z))!=-1 && (nb< map.get(new Pair<>(x,y)))){
-                        map.replace(new Pair<>(x,y),nb);
-                        pred[x.getId()][y.getId()]=pred[z.getId()][y.getId()];
-                    }*/
-                    int nb=(mat[x.getId()][z.getId()] + mat[z.getId()][y.getId()]);
-                    if(mat[x.getId()][z.getId()]!=-1 && mat[z.getId()][y.getId()]!=-1 && (nb< mat[x.getId()][y.getId()] || mat[x.getId()][y.getId()]<0)){
+                    Pair xy=new Pair(x,y);
+                    Pair xz=new Pair(x,z);Pair zy=new Pair(z,y);
+                    Pair res_xy=map.get(xy);Pair res_xz=map.get(xz);Pair res_zy=map.get(zy);
+                    int nb=((int)res_xz.getFirst() + (int)res_zy.getFirst());
+                    if((int)res_xz.getFirst()!=INF && (int)res_zy.getFirst()!=INF && (nb< (int)res_xy.getFirst())){
+                        map.replace(xy,new Pair<>(nb,z));
                         mat[x.getId()][y.getId()]=nb;
-                        //System.err.println(map.get(new Pair<>(x,y)));
-                        map.replace(new Pair<>(x,y),new Pair<>(nb,z));
                         pred[x.getId()][y.getId()]=pred[z.getId()][y.getId()];
                     }
                 }
             }
         }
-        for(int[] a : mat)
-            System.out.println(Arrays.toString(a));
         return map;
     }
 
-    public List<Pair<Node,Node>> getListPair(int [][]mat){
+    public List<Pair<Node,Node>> getListPair(Map<Pair<Node,Node>,Pair<Integer,Node>> map){
         List<Node> list_impair=new ArrayList<>();
         List<Pair<Node,Node>> list_final=new ArrayList<>();
 
@@ -452,16 +437,20 @@ public class ChinesePostman {
             }
         }
         Collections.sort(list_impair);
-        /*for(Node n1 : list_impair){
-            for(Node n2 : list_impair){
-                if(n1.equals(n2) || n1.getId() < n2.getId()) continue;
-                Pair p=new Pair(n1,n2);
+        for(Pair p : map.keySet()){
+            if(list_impair.contains(p.getFirst()) && list_impair.contains(p.getSecond()) && !(p.getFirst().equals(p.getSecond()))){
                 list_Pair.add(p);
             }
-        }*/
-        for(int i=0;i<list_impair.size();i+=2) {
-            Pair p = new Pair(list_impair.get(i), list_impair.get(i+1));
-            list_final.add(p);
+        }
+
+        //get final list random
+        List<Node> node_used=new ArrayList<>(); //Look if the node has already been add in the list of pair
+        for(Pair<Node,Node> p : list_Pair){
+            if(!(node_used.contains(p.getFirst())) && !(node_used.contains(p.getSecond()))){
+                list_final.add(p);
+                node_used.add(p.getFirst());
+                node_used.add(p.getSecond());
+            }
         }
 
         return list_final;

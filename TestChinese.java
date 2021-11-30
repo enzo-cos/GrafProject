@@ -4,6 +4,7 @@ import org.junit.jupiter.api.Test;
 import java.io.File;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
 import m1graf2021.*;
 
@@ -120,24 +121,22 @@ public class TestChinese {
         //2,3 = 1   2,4 = 1   2,5 = 3
         // 3,4 = 2   3,5 2
         // 4,5 = 4
-        System.out.println(graf.Floyd_Warshall());
-        /*int [][] m =graf.Floyd_Warshall();
-        for(int[] a : m)
-        System.out.println(Arrays.toString(a));*/
-        //1,2 = 2   1,3 = 5  1,4 = 2    1,5 = 7
-        //2,3 = 3   2,4 = 1   2,5 = 5
-        // 3,4 = 4   3,5 2
-        // 4,5 = 6
+        Map map=graf.Floyd_Warshall();
+        System.out.println(map);
     }
 
     @Test
     public void testTD(){
         UndirectedGraf g=new UndirectedGraf();
-        File f=new File("src/Eulerian.gv");
+        File f=new File("src/Exemple_TD.gv");
         ChinesePostman graf=new ChinesePostman(f);
         // 3 5 9 10
         // 3,5 9,10 =12    3,9 5,10 =16      3,10 5,9 = 15
-
+        Map map=graf.Floyd_Warshall();
+        System.out.println(map);
+        List<Pair> list=graf.getListPair(map);
+        System.out.println("list of pair : "+list);
+        //graf.duplicateEdge
 
         // 3,5 9,10
     }
