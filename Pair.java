@@ -50,6 +50,13 @@ class Pair<T1,T2> {
         return second;
     }
 
+    /**
+     * Get the reverse of the Pair
+     * @return reverse
+     */
+    public Pair getReverse(){
+        return new Pair(this.second,this.first);
+    }
 
     @Override
     public String toString(){

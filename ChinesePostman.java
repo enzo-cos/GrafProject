@@ -4,6 +4,7 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.lang.reflect.Array;
 import java.lang.reflect.UndeclaredThrowableException;
 import java.util.*;
 
@@ -16,6 +17,8 @@ public class ChinesePostman {
     private String optionDot;
     private String finalLabel;
     private Map<Edge,ArrayList<String>> mapOptionsEdge;
+    private int nbEdgeAdded=0;
+    private int typeGraf=0;
 
     public ChinesePostman(){
         graf=new UndirectedGraf();
@@ -207,6 +210,9 @@ public class ChinesePostman {
             }
             if(!new_l) str+=";\n";
         }
+        if(!finalLabel.isEmpty()){
+            str+="label=\""+finalLabel+"\"";
+        }
         str+="}";
         return str;
     }
@@ -285,11 +291,18 @@ public class ChinesePostman {
      * @return list Eulerian Circuit
      */
     public List<Node> getEulerianCircuit(){
-        UndirectedGraf g=graf;
+        UndirectedGraf g=new UndirectedGraf(graf.toSuccessorArray());
         List<Node> list=new LinkedList<>();
         Node n=g.getNode(1);
         int ind=-1;
-        return getEulerian_rec(n,list,g,ind);
+        list= getEulerian_rec(n,list,g,ind);
+        String str="Type: ChinesePostman\nChinese circuit: [";
+        for(Node node: list){
+            str+=node+" ";
+        }
+        str+="]\nTotal length : X\nExtraCost : Y\n";
+        finalLabel=str;
+        return list;
     }
 
     /**
@@ -411,8 +424,15 @@ public class ChinesePostman {
                 for (Node z : list_node) {
                     Pair xy=new Pair(x,y);
                     Pair xz=new Pair(x,z);Pair zy=new Pair(z,y);
+                    if(x.equals(z) || z.equals(y)) continue;
                     Pair res_xy=map.get(xy);Pair res_xz=map.get(xz);Pair res_zy=map.get(zy);
-                    int nb=((int)res_xz.getFirst() + (int)res_zy.getFirst());
+                    int dist2=(int)res_zy.getFirst();
+                    //Compare with the reverse of the Pair
+                    if(map.get(zy.getReverse()).getFirst() < dist2) {
+                        res_zy=map.get(zy.getReverse());
+                        dist2= (int) res_zy.getFirst();
+                    }
+                    int nb=(int)res_xz.getFirst() + dist2;
                     if((int)res_xz.getFirst()!=INF && (int)res_zy.getFirst()!=INF && (nb< (int)res_xy.getFirst())){
                         map.replace(xy,new Pair<>(nb,z));
                         mat[x.getId()][y.getId()]=nb;
@@ -421,6 +441,9 @@ public class ChinesePostman {
                 }
             }
         }
+        /*for(int[]a : mat){
+            System.out.println(Arrays.toString(a));
+        }*/
         return map;
     }
 
@@ -456,6 +479,37 @@ public class ChinesePostman {
         return list_final;
     }
 
+    public void duplicateEdge(Map<Pair<Node,Node>,Pair<Integer,Node>> map, List<Pair<Node,Node>> list_pair){
+        for(Pair p : list_pair){
+           /* Node start= (Node) p.getFirst();
+            Node target= (Node) p.getSecond();
+            Node pass=map.get(p).getSecond();*/
+            duplicateEdgeRec(map,p);
+        }
+    }
+
+    public void duplicateEdgeRec(Map<Pair<Node,Node>,Pair<Integer,Node>> map,Pair<Node,Node> pair){
+            Node start= (Node) pair.getFirst();
+            Node target= (Node) pair.getSecond();
+       // System.err.println(pair);
+            Node pass=map.get(pair).getSecond();
+        //System.err.println(pass);
+        if(pass==null){
+            int w =getMinEdge(start,target,graf.getAllEdges()).getWeight();
+            Edge e = new Edge(start,target,w);
+            if(e.from().getId()>e.to().getId()) e=e.getSymmetric();
+            graf.addEdge(e);
+            nbEdgeAdded++;
+            ArrayList<String> list=new ArrayList<>();
+            list.add("color=green");list.add("fontcolor=green");
+            mapOptionsEdge.put(e, list);
+            return;
+        }
+        Pair<Node,Node> p2=new Pair<>(pass,target);
+        duplicateEdgeRec(map,p2);
+                Pair<Node,Node> p=new Pair<>(start,pass);
+                duplicateEdgeRec(map,p);
+    }
 
 
     /**

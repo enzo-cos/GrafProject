@@ -134,10 +134,35 @@ public class TestChinese {
         // 3,5 9,10 =12    3,9 5,10 =16      3,10 5,9 = 15
         Map map=graf.Floyd_Warshall();
         System.out.println(map);
-        List<Pair> list=graf.getListPair(map);
+        List<Pair<Node,Node>> list=graf.getListPair(map);
         System.out.println("list of pair : "+list);
         //graf.duplicateEdge
+        for(Pair p : list){
+            System.out.println(map.get(p));
+        }
+        graf.duplicateEdge(map,list);
+        //System.out.println(graf.toDotString());
+        System.out.println(graf.getEulerianCircuit());
+        // 3,5 9,10
+    }
 
+    @Test
+    public void testGiven(){
+        UndirectedGraf g=new UndirectedGraf();
+        File f=new File("src/exempleFinal");
+        ChinesePostman graf=new ChinesePostman(f);
+        graf.isEulerian();
+        Map map=graf.Floyd_Warshall();
+        System.out.println(map);
+        List<Pair<Node,Node>> list=graf.getListPair(map);
+        System.out.println("list of pair : "+list);
+        //graf.duplicateEdge
+        for(Pair p : list){
+            System.out.println(map.get(p));
+        }
+        graf.duplicateEdge(map,list);
+        System.out.println(graf.getEulerianCircuit());
+        System.out.println(graf.toDotString());
         // 3,5 9,10
     }
 
