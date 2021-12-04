@@ -2,7 +2,6 @@ import org.junit.Assert;
 import org.junit.jupiter.api.Test;
 
 import java.io.File;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -58,7 +57,7 @@ public class TestChinese {
         ChinesePostman graf=new ChinesePostman(f);
         System.out.println(graf.toDotString());
         int[] expect={1,2,3,4,5,3,2,4,1};
-        List<Node> list=graf.getEulerianCircuit();
+        List<Node> list=graf.getEulerianCircuitNode();
         System.out.println(list);
         int i=0;
         for(Node n : list){
@@ -70,8 +69,7 @@ public class TestChinese {
         graf=new ChinesePostman(f);
         System.out.println(graf.toDotString());
         int[]expect2={1,2,3,6,5,7,8,9,10,8,6,2,4,1,4,5,1};
-        list=graf.getEulerianCircuit();
-        System.out.println(list);
+        list=graf.getEulerianCircuitNode();
         i=0;
         for(Node n : list){
             Assert.assertEquals(expect2[i],n.getId());
@@ -87,7 +85,7 @@ public class TestChinese {
         ChinesePostman graf=new ChinesePostman(f);
         Node n= graf.getMinNodeOdd();
         int[] expect={2,1,4,3,2,3,5,4};
-        List<Node> list=graf.getSemiEulerianCircuit(n);
+        List<Node> list=graf.getSemiEulerianCircuitNode(n);
         System.out.println(list);
         int i=0;
         for(Node node : list){
@@ -100,7 +98,7 @@ public class TestChinese {
         graf=new ChinesePostman(f);
         n= graf.getMinNodeOdd();
         int[] expect2={3,2,1,4,5,2,7,3,5,7,6,4};
-        list=graf.getSemiEulerianCircuit(n);
+        list=graf.getSemiEulerianCircuitNode(n);
         System.out.println(list);
         i=0;
         for(Node node : list){
@@ -134,7 +132,7 @@ public class TestChinese {
         // 3,5 9,10 =12    3,9 5,10 =16      3,10 5,9 = 15
         Map map=graf.Floyd_Warshall();
         System.out.println(map);
-        List<Pair<Node,Node>> list=graf.getListPair(map);
+        List<Pair<Node,Node>> list=graf.getListPair(map,true);
         System.out.println("list of pair : "+list);
         //graf.duplicateEdge
         for(Pair p : list){
@@ -142,7 +140,7 @@ public class TestChinese {
         }
         graf.duplicateEdge(map,list);
         //System.out.println(graf.toDotString());
-        System.out.println(graf.getEulerianCircuit());
+        System.out.println(graf.getEulerianCircuitNode());
         // 3,5 9,10
     }
 
@@ -154,16 +152,25 @@ public class TestChinese {
         graf.isEulerian();
         Map map=graf.Floyd_Warshall();
         System.out.println(map);
-        List<Pair<Node,Node>> list=graf.getListPair(map);
+        List<Pair<Node,Node>> list=graf.getListPair(map,false);
         System.out.println("list of pair : "+list);
         //graf.duplicateEdge
         for(Pair p : list){
             System.out.println(map.get(p));
         }
         graf.duplicateEdge(map,list);
-        System.out.println(graf.getEulerianCircuit());
+        System.out.println(graf.getEulerianCircuitNode());
         System.out.println(graf.toDotString());
         // 3,5 9,10
+    }
+
+    @Test
+    public void TestGeneral(){
+        File f=new File("src/Exemple_TD.gv");
+        ChinesePostman g=new ChinesePostman(f);
+        List<Edge> l=g.getEulerianCircuit(true);
+        System.out.println(l);
+        System.out.println(g.toDotString());
     }
 
 }

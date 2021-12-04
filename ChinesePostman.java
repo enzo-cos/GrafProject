@@ -4,34 +4,39 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
-import java.lang.reflect.Array;
-import java.lang.reflect.UndeclaredThrowableException;
 import java.util.*;
 
 /******************************
  *****     PW3 PROJECT   ******
  *****************************/
 public class ChinesePostman {
-    private UndirectedGraf graf;
-    private String rankdir;
+    private final UndirectedGraf graf;
     private String optionDot;
     private String finalLabel;
-    private Map<Edge,ArrayList<String>> mapOptionsEdge;
+    private final Map<Edge,ArrayList<String>> mapOptionsEdge;
     private int nbEdgeAdded=0;
-    private int typeGraf=0;
+    private String typeGraf;
 
+    /**
+     * Constructor of Chinese Postman Problem
+     */
     public ChinesePostman(){
         graf=new UndirectedGraf();
-        rankdir="";
         optionDot="";
         finalLabel="";
         mapOptionsEdge=new HashMap<>();
+        typeGraf="";
     }
+
+    /**
+     * Constructor of Chinese Postman Problem from a given graph
+     * @param g     graph given
+     */
     public ChinesePostman(UndirectedGraf g){
         graf=g;
-        rankdir="";
         optionDot="";
         finalLabel="";
+        typeGraf="";
         mapOptionsEdge=new HashMap<>();
     }
 
@@ -41,9 +46,9 @@ public class ChinesePostman {
      */
     public ChinesePostman(File fich){
         graf=new UndirectedGraf();
-        rankdir="";
         optionDot="";
         finalLabel="";
+        typeGraf="";
         mapOptionsEdge=new HashMap<>();
         if (!fich.exists()){
             throw new RuntimeException("File doesn't exist");
@@ -56,7 +61,6 @@ public class ChinesePostman {
             BufferedReader br = new BufferedReader(f);
             String line;
             String first;
-            String strOptionEdge="";
 
             if((line = br.readLine()) != null){
                 first=line.trim();
@@ -67,11 +71,8 @@ public class ChinesePostman {
             }
             //read the nodes and egdes
             while ((line = br.readLine()) != null) {
-                if(line.contains("rankdir")||line.contains("RANKDIR")){
-                    rankdir=line.trim();
-                }
-                if(line.contains("rank")) {
-                    optionDot+=line.trim()+"\n";
+                if(line.contains("rank") || line.contains("RANK")) {
+                    optionDot=optionDot.concat(line.trim()+"\n");
                 }
                 line = line.trim();
                 String[] tab_str = line.split("--");
@@ -96,13 +97,13 @@ public class ChinesePostman {
                             first = first.substring(0, first_length - 1);
                             graf.addNode(Integer.parseInt(first));
                         }else { //Edge
-                            Integer nb = Integer.parseInt(first);
+                            int nb = Integer.parseInt(first);
                             String str_2=tab_str[1];
 
                             if(str_2.contains("[")){ //Ex : 1-- 1[len=4,label="4"];
                                 //+ de Précisions : rechercher dans tab_str[0] .split l'élément contenant le len et faire indice+1
                                 int ind=str_2.indexOf("[");
-                                Integer to=Integer.parseInt(str_2.substring(0,ind).trim());
+                                int to=Integer.parseInt(str_2.substring(0,ind).trim());
                                 if(str_2.contains("len")) {
                                     String len = str_2.split("=")[1].trim();
                                     int ind_virg = len.indexOf(",");
@@ -132,7 +133,7 @@ public class ChinesePostman {
                                     String ff = str.substring(str.length() - 1);
                                     if (ff.compareTo(";") == 0)
                                         str = str.substring(0, str.length() - 1);
-                                    Integer nbNode = Integer.parseInt(str);
+                                    int nbNode = Integer.parseInt(str);
                                     Edge e = new Edge(nb, nbNode);
                                     graf.addEdge(e);
                                     i++;
@@ -155,7 +156,7 @@ public class ChinesePostman {
      */
     public String toDotString(){
         String str="";
-        str+="graph {\n";
+        str=str.concat("graph {\n");
         if(!optionDot.isEmpty()){
             str+=optionDot+";\n";
         }
@@ -164,14 +165,14 @@ public class ChinesePostman {
         for(Node n : list_node){
             String nb=Integer.toString(n.getId());
             if(n.getName()!=null && !n.getName().isEmpty()){
-                str+="\t"+nb+"[label=\""+n.getName()+"\"];\n";
+                str=str.concat("\t"+nb+"[label=\""+n.getName()+"\"];\n");
             }
             List<Edge> list_edges=new ArrayList<>();
             for(Edge e : list_total_edge){
                 if(e.from().getId()==n.getId()) list_edges.add(e);
             }
-            if(list_edges==null || list_edges.isEmpty()){
-                str+="\t"+nb+";\n";
+            if(list_edges.isEmpty()){
+                str=str.concat("\t"+nb+";\n");
                 continue;
             }
             boolean new_l=true; //Know if we have to put a "," and know if it's a new line or not
@@ -180,35 +181,35 @@ public class ChinesePostman {
                 ArrayList<String> list=mapOptionsEdge.get(e);
                 if(list!=null && !list.isEmpty()){
                     for(String s : list) {
-                        optEdge += "," + s;
+                        optEdge =optEdge.concat("," + s);
                     }
                     mapOptionsEdge.remove(e);
                 }
-                if(new_l) str+="\t"+nb+" -- ";
+                if(new_l) str=str.concat("\t"+nb+" -- ");
                 if(e.getWeight()!=null){
                     String w = Integer.toString(e.getWeight()); //get weight
                     if(new_l){
-                        str += e.to().getId() + "[len=" + w + ",label=" + w + optEdge+"];\n";
+                        str =str.concat( e.to().getId() + "[len=" + w + ",label=" + w + optEdge+"];\n");
                     }else{ //write a new line
-                        str += ";\n\t" + nb + " -- " + e.to().getId() + "[len=" + w + ",label=" + w + optEdge+"];\n";
+                        str=str.concat( ";\n\t" + nb + " -- " + e.to().getId() + "[len=" + w + ",label=" + w + optEdge+"];\n");
                         new_l=true;
                     }
                 }else{ //no weight
                     if(!optEdge.isEmpty()){
                         if(new_l){
-                            str += e.to().getId() + "["+ optEdge.substring(1)+"];\n";
+                            str=str.concat( e.to().getId() + "["+ optEdge.substring(1)+"];\n");
                         }else{ //write a new line
-                            str += ";\n\t" + nb + " -- " + e.to().getId() + "["+ optEdge.substring(1)+"];\n";
+                            str=str.concat( ";\n\t" + nb + " -- " + e.to().getId() + "["+ optEdge.substring(1)+"];\n");
                             new_l=true;
                         }
                     }else {
-                        if (!new_l) str += ", ";
-                        str += Integer.toString(e.to().getId());
+                        if (!new_l) str=str.concat( ", ");
+                        str=str.concat(Integer.toString(e.to().getId()));
                         new_l = false;
                     }
                 }
             }
-            if(!new_l) str+=";\n";
+            if(!new_l) str=str.concat(";\n");
         }
         if(!finalLabel.isEmpty()){
             str+="label=\""+finalLabel+"\"";
@@ -249,9 +250,9 @@ public class ChinesePostman {
 
     /**
      * Know if a graf is eulerian
-     * @return 0 if Eulerian
-     * @return 1 if semi-Eulerian
-     * @return -1 if not Eulerian
+     * @return   0 if Eulerian
+     *           1 if semi-Eulerian
+     *          -1 if not Eulerian
      */
     public int isEulerian(){
         int nbOddDegree=0; //Number of odd degree node
@@ -273,11 +274,10 @@ public class ChinesePostman {
      * @return node
      */
     public Node getMinSuccessor(Node n, UndirectedGraf g){
+        if(g==null) return null;
         List<Node> list=g.getSuccessors(n);
-        int i=0;
-        Node node=null;
         if(list.size()<1) return null;
-        node=list.get(0);
+        Node node=list.get(0);
         for(Node n1 : list){
             if(n1.getId()< node.getId()){
                 node=n1;
@@ -287,21 +287,71 @@ public class ChinesePostman {
     }
 
     /**
+     * Get and compute the eulerian circuit of the graph.
+     * if the graph is Eulerian -> call getEulerianCircuitNode
+     * if the graph is Semi-Eulerian -> call getSemiEulerianCircuitNode
+     * if the graph is not Eulerian -> compute the ChineseProblem
+     * @param random if true -> compute ChinesePostman with random Pair
+     *               else -> compute with the minimal weighted path
+     * @return list : list of edge of the circuit
+     */
+    public List<Edge> getEulerianCircuit(boolean random){
+        List<Edge> alledge=graf.getAllEdges();
+        List<Edge> list=new ArrayList<>();
+        List<Node> list_node=new ArrayList<>();
+        int isEulerian=isEulerian();
+        if(isEulerian==0){
+            //Eulerian Graph
+            typeGraf="Eulerian Graph";
+            list_node= getEulerianCircuitNode();
+        }else if(isEulerian==1){
+            //Semi Eulerian Graph
+            typeGraf="Semi-Eulerian Graph";
+            Node nfirst=getMinNodeOdd();
+            list_node=getSemiEulerianCircuitNode(nfirst);
+        }else if(isEulerian==-1){
+            //Not Eulerian -> Chinese Postman problem
+            typeGraf="ChinesePostman";
+            Map<Pair<Node, Node>, Pair<Integer, Node>> map=Floyd_Warshall();
+            System.out.println(map);
+            List<Pair<Node, Node>> listOfPair=getListPair(map,random);
+            System.out.println(listOfPair);
+            duplicateEdge(map,listOfPair);
+            list_node=getEulerianCircuitNode();
+        }
+
+        Node curr=list_node.get(0);
+        int k=0;
+        int totalLength=0;
+        String str="Type: "+typeGraf+"\nChinese circuit: [";
+        for(Node node: list_node){
+            if(k==0){
+                k++;
+                continue;
+            }
+            Edge e=getMinEdge(curr,node,alledge);
+            if(!e.from().equals(curr)) e=e.getSymmetric();
+            list.add(e);
+            totalLength+=e.getWeight();
+            str=str.concat(e+" ");
+            curr=node;
+            k++;
+        }
+        str+="]\nTotal length : "+totalLength+"\nExtraCost : "+nbEdgeAdded+"\n";
+        finalLabel=str;
+        return list;
+    }
+
+    /**
      * Obtain Eulerian circuit from a graf
      * @return list Eulerian Circuit
      */
-    public List<Node> getEulerianCircuit(){
+    public List<Node> getEulerianCircuitNode(){
         UndirectedGraf g=new UndirectedGraf(graf.toSuccessorArray());
         List<Node> list=new LinkedList<>();
         Node n=g.getNode(1);
         int ind=-1;
         list= getEulerian_rec(n,list,g,ind);
-        String str="Type: ChinesePostman\nChinese circuit: [";
-        for(Node node: list){
-            str+=node+" ";
-        }
-        str+="]\nTotal length : X\nExtraCost : Y\n";
-        finalLabel=str;
         return list;
     }
 
@@ -344,7 +394,7 @@ public class ChinesePostman {
      * Obtain Eulerian circuit from a graf
      * @return list Eulerian Circuit
      */
-    public List<Node> getSemiEulerianCircuit(Node nfirst){
+    public List<Node> getSemiEulerianCircuitNode(Node nfirst){
         UndirectedGraf g = (UndirectedGraf) graf.getGraf();
         return getEulerian_rec(nfirst,new LinkedList<>(),g,-1);
     }
@@ -365,9 +415,15 @@ public class ChinesePostman {
         return list_impair.get(0);
     }
 
+    /**
+     * Get the edge with the minimum weight between two Nodes
+     * @param n1    Started Node
+     * @param n2    Target Node
+     * @param list_edge List of edge of the graph
+     * @return e : Edge with the minimal weight
+     */
     public Edge getMinEdge(Node n1, Node n2,List<Edge> list_edge){
-        List<Edge> list=new ArrayList<>();
-        list.addAll(list_edge);
+        List<Edge> list=new ArrayList<>(list_edge);
         Edge e=new Edge(n1,n2);
         if(e.from().getId()>e.to().getId()) e=e.getSymmetric();
         int k=list.indexOf(e);
@@ -390,8 +446,8 @@ public class ChinesePostman {
 
     /**
      * Compute the shortest path between two Nodes
+     * @return map : Map linking Pair of Node with the distance
      */
-    //Map<Pair<Node,Node>,Pair<Integer,Node>>
     public Map<Pair<Node,Node>,Pair<Integer,Node>> Floyd_Warshall(){
         final int INF=(int)Double.POSITIVE_INFINITY - 10000000;
         Map<Pair<Node,Node>,Pair<Integer,Node>> map=new HashMap<>();
@@ -422,18 +478,18 @@ public class ChinesePostman {
         for(Node x : list_node) {
             for (Node y : list_node) {
                 for (Node z : list_node) {
-                    Pair xy=new Pair(x,y);
-                    Pair xz=new Pair(x,z);Pair zy=new Pair(z,y);
+                    Pair<Node,Node> xy=new Pair<>(x,y);
+                    Pair<Node,Node> xz=new Pair<>(x,z);Pair<Node,Node> zy=new Pair<>(z,y);
                     if(x.equals(z) || z.equals(y)) continue;
-                    Pair res_xy=map.get(xy);Pair res_xz=map.get(xz);Pair res_zy=map.get(zy);
-                    int dist2=(int)res_zy.getFirst();
+                    Pair<Integer,Node> res_xy=map.get(xy);Pair<Integer,Node> res_xz=map.get(xz);Pair <Integer,Node>res_zy=map.get(zy);
+                    int dist2=res_zy.getFirst();
                     //Compare with the reverse of the Pair
                     if(map.get(zy.getReverse()).getFirst() < dist2) {
                         res_zy=map.get(zy.getReverse());
-                        dist2= (int) res_zy.getFirst();
+                        dist2= res_zy.getFirst();
                     }
-                    int nb=(int)res_xz.getFirst() + dist2;
-                    if((int)res_xz.getFirst()!=INF && (int)res_zy.getFirst()!=INF && (nb< (int)res_xy.getFirst())){
+                    int nb=res_xz.getFirst() + dist2;
+                    if(res_xz.getFirst()!=INF && res_zy.getFirst()!=INF && (nb< res_xy.getFirst())){
                         map.replace(xy,new Pair<>(nb,z));
                         mat[x.getId()][y.getId()]=nb;
                         pred[x.getId()][y.getId()]=pred[z.getId()][y.getId()];
@@ -441,13 +497,49 @@ public class ChinesePostman {
                 }
             }
         }
-        /*for(int[]a : mat){
-            System.out.println(Arrays.toString(a));
-        }*/
         return map;
     }
 
-    public List<Pair<Node,Node>> getListPair(Map<Pair<Node,Node>,Pair<Integer,Node>> map){
+    /**
+     * get all Pairs combinaisons
+     * @param list_impair   list of odd degree's Node
+     * @param list_Pair     list of pairs to compute
+     * @param k             index
+     */
+    public void getHeap(List<Node> list_impair, List<Pair<Node,Node>> list_Pair, int k){
+        if(k==1){
+            for(int i=0;i<list_impair.size()-1;i+=2) {
+                Pair<Node,Node> p = new Pair<>(list_impair.get(i),list_impair.get(i+1));
+                if((list_Pair.contains(p)) || list_Pair.contains(p.getReverse())) continue;
+                list_Pair.add(p);
+            }
+            return;
+        }
+        getHeap(list_impair,list_Pair,k-1);
+        for(int i=0;i<k-1;++i){
+            Node curr;
+            if(k%2==0){
+                curr=list_impair.get(i);
+                list_impair.set(i,list_impair.get(k-1));
+                list_impair.set(k-1,curr);
+            }else{
+                curr=list_impair.get(0);
+                list_impair.set(0,list_impair.get(k-1));
+                list_impair.set(k-1,curr);
+            }
+            getHeap(list_impair,list_Pair,k-1);
+        }
+
+    }
+
+
+    /**
+     * Get the list of pair of odd Degree Node for compute the Chinese Postman Algorithme
+     * @param map       Map linking Pair of Node with the distance
+     * @param random    Boolean for getting Random Pair or with minimum distances
+     * @return list of pair of edges that we will duplicate
+     */
+    public List<Pair<Node,Node>> getListPair(Map<Pair<Node,Node>,Pair<Integer,Node>> map, boolean random){
         List<Node> list_impair=new ArrayList<>();
         List<Pair<Node,Node>> list_final=new ArrayList<>();
 
@@ -459,41 +551,78 @@ public class ChinesePostman {
                 list_impair.add(node);
             }
         }
-        Collections.sort(list_impair);
-        for(Pair p : map.keySet()){
-            if(list_impair.contains(p.getFirst()) && list_impair.contains(p.getSecond()) && !(p.getFirst().equals(p.getSecond()))){
-                list_Pair.add(p);
+        if(random) {
+            for(Pair<Node,Node> p : map.keySet()){
+                if(list_impair.contains(p.getFirst()) && list_impair.contains(p.getSecond()) && !(p.getFirst().equals(p.getSecond()))){
+                    list_Pair.add(p);
+                }
             }
-        }
-
-        //get final list random
-        List<Node> node_used=new ArrayList<>(); //Look if the node has already been add in the list of pair
-        for(Pair<Node,Node> p : list_Pair){
-            if(!(node_used.contains(p.getFirst())) && !(node_used.contains(p.getSecond()))){
-                list_final.add(p);
-                node_used.add(p.getFirst());
-                node_used.add(p.getSecond());
+            Collections.shuffle(list_Pair);
+            //get final list random
+            List<Node> node_used = new ArrayList<>(); //Look if the node has already been add in the list of pair
+            for (Pair<Node, Node> p : list_Pair) {
+                if (!(node_used.contains(p.getFirst())) && !(node_used.contains(p.getSecond()))) {
+                    list_final.add(p);
+                    node_used.add(p.getFirst());
+                    node_used.add(p.getSecond());
+                }
             }
+        }else{
+            int k=list_impair.size();
+            int nb_pair=k/2;
+            getHeap(list_impair,list_Pair,k);
+            int dist=0;
+            for (int i=0;i<nb_pair;i++){
+                Pair<Node,Node> _p=list_Pair.get(i);
+                dist+=map.get(_p).getFirst();
+                list_final.add(_p);
+            }
+            //System.err.println("dist : "+dist);
+            int nb_combinaison=list_Pair.size();
+            for(int i=nb_pair;i<nb_combinaison;i+=nb_pair){
+                int dist2=0;
+                List<Pair<Node,Node>> list_curr=new ArrayList<>();
+                for(int n=i;n<i+nb_pair;n++){
+                    Pair<Node,Node> _p=list_Pair.get(n);
+                    list_curr.add(_p);
+                    dist2+=map.get(_p).getFirst();
+                }
+                //System.err.println("dist : "+dist2);
+                //System.err.println(list_curr+"\n");
+                if(dist2<dist){
+                    list_final=list_curr;
+                    dist=dist2;
+                }
+            }
+            /*System.err.println(list_final);
+            for(Pair p : list_final){
+                System.err.println(map.get(p).getFirst());
+            }*/
         }
 
         return list_final;
     }
 
+    /**
+     * Duplicate Edges through which we pass for the Chinese Postman Problem
+     * @param map Map linking Pair of Node with the distance
+     * @param list_pair List of pairs used
+     */
     public void duplicateEdge(Map<Pair<Node,Node>,Pair<Integer,Node>> map, List<Pair<Node,Node>> list_pair){
-        for(Pair p : list_pair){
-           /* Node start= (Node) p.getFirst();
-            Node target= (Node) p.getSecond();
-            Node pass=map.get(p).getSecond();*/
+        for(Pair<Node,Node> p : list_pair){
             duplicateEdgeRec(map,p);
         }
     }
 
+    /**
+     * Recursive fonction to duplicate edges
+     * @param map   Map linking Pair of Node with the distance
+     * @param pair  pair for which we must duplicate the paths
+     */
     public void duplicateEdgeRec(Map<Pair<Node,Node>,Pair<Integer,Node>> map,Pair<Node,Node> pair){
-            Node start= (Node) pair.getFirst();
-            Node target= (Node) pair.getSecond();
-       // System.err.println(pair);
-            Node pass=map.get(pair).getSecond();
-        //System.err.println(pass);
+        Node start= pair.getFirst();
+        Node target= pair.getSecond();
+        Node pass=map.get(pair).getSecond();
         if(pass==null){
             int w =getMinEdge(start,target,graf.getAllEdges()).getWeight();
             Edge e = new Edge(start,target,w);
@@ -507,15 +636,8 @@ public class ChinesePostman {
         }
         Pair<Node,Node> p2=new Pair<>(pass,target);
         duplicateEdgeRec(map,p2);
-                Pair<Node,Node> p=new Pair<>(start,pass);
-                duplicateEdgeRec(map,p);
+        Pair<Node,Node> p=new Pair<>(start,pass);
+        duplicateEdgeRec(map,p);
     }
 
-
-    /**
-     * Retourner le DotFile
-     */
-    public String getDotFile(){
-        return graf.toDotString();
-    }
 }

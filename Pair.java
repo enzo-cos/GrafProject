@@ -64,11 +64,6 @@ class Pair<T1,T2> {
         return ("("+this.first.toString()+","+this.second.toString()+")");
     }
 
-    /*@Override
-    public int compareTo(Pair pair) {
-        return 0;
-    }*/
-
     @Override
     public int hashCode() {
         return this.toString().hashCode();
