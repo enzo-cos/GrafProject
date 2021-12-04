@@ -1,9 +1,6 @@
 import m1graf2021.*;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
+import java.io.*;
 import java.util.*;
 
 /******************************
@@ -638,6 +635,23 @@ public class ChinesePostman {
         duplicateEdgeRec(map,p2);
         Pair<Node,Node> p=new Pair<>(start,pass);
         duplicateEdgeRec(map,p);
+    }
+
+    /**
+     * Export the graph as a File in the DOT syntax
+     * No extension needed, it will create a file .gv
+     * @param fileName : Name of the file to create
+     */
+    public void toDotFile(String fileName){
+        String str=this.toDotString();
+        File fich=new File(fileName+".gv");
+        try{
+            FileWriter fw = new FileWriter(fich);
+            fw.write(str);
+            fw.close();
+        }catch (Exception e ){
+            System.err.println("Error while opening file");
+        }
     }
 
 }

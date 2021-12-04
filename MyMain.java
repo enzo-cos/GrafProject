@@ -1,10 +1,15 @@
 import m1graf2021.*;
+
+import java.io.File;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Scanner;
 
 public class MyMain {
+    static ChinesePostman g=new ChinesePostman();
+    static Graf graf=null;
+    static String path="";
     /**
      * Display Graph's creation menu
      * @return
@@ -172,12 +177,109 @@ public class MyMain {
         }
     }
 
+    /**
+     * Display print Menu
+     * @return
+     */
+    public static void dotFile(){
+        System.out.println("\n***** Get a Graph from a Dot File *****\n\nwrite the path to your dot file : \nTap ENTER to validate\n\n");
+        Scanner input = new Scanner(System.in);
+        path = input.nextLine();
+    }
+
+
+    /**
+     * ChinesePostmanMenu
+     * @return
+     */
+    public static int ChinesePostmanMenu(){
+        System.out.println("\n***** CHINESEPOSTMAN MENU *****\nWhat do you want to do : ");
+        System.out.println("- 0 - to init the problem with your actual graph");
+        System.out.println("- 1 - to get a graph from a dot File");
+        System.out.println("- 2 - to know if your graph is Eulerian, semi-Eulerian or not Eulerian");
+        System.out.println("- 3 - to resolve the ChinesePostman Problem and get the Eulerian circuit of your graph ");
+        System.out.println("- 4 - print your graph in a dotFile");
+        System.out.println("- 5 - to extract your graph in a dot file");
+        System.out.println("- q - to stop\n\n");
+
+        Scanner input = new Scanner(System.in);
+        char choice = input.nextLine().charAt(0);
+        switch (choice){
+            case '0' :
+                try{
+                    g=new ChinesePostman((UndirectedGraf) graf);
+                }catch (Exception e ){
+                    System.err.println("The actual graph is not an undirected graph");
+                }
+                return ChinesePostmanMenu();
+
+            case '1' :
+                dotFile();
+                try{
+                    File f =new File(path);
+                    if(!(f.exists() && f.canRead())){
+                        System.err.println("File not exist, please retry");
+                        return ChinesePostmanMenu();
+                    }
+                    try {
+                        g=new ChinesePostman(f);
+                    }catch (Exception e){
+                        System.err.println("invalide file");
+                        return ChinesePostmanMenu();
+                    }
+
+                }catch (Exception e){
+                    System.err.println("Invalide path\nPlease Retry\n");
+                }finally {
+                    return ChinesePostmanMenu();
+                }
+
+            case '2' : //Graph Eulerian or not
+                int n=g.isEulerian();
+                System.out.println("\n\n");
+                if(n==0){
+                    System.out.println("The graph is Eulerian");
+                }else if(n==1){
+                    System.out.println("The graph is Semi-Eulerian");
+                }else if (n==-1){
+                    System.out.println("The graph is not Eulerian");
+                }
+
+                return ChinesePostmanMenu();
+            case '3' :
+                boolean b=false;
+                System.out.println("Do you want to compute the ChineseProblem with random Pair ?\ny for Yes     n for No\n");
+                choice = input.nextLine().charAt(0);
+                if(choice=='y') b=true;
+                List<Edge> l=g.getEulerianCircuit(b);
+                return ChinesePostmanMenu();
+            case '4' : //print dotFile
+                System.out.println(g.toDotString());
+                return ChinesePostmanMenu();
+            case '5' :
+                String strr=input.nextLine();
+                g.toDotFile(strr);
+                return ChinesePostmanMenu();
+            case 'q' :
+                return -1;
+            default:
+                System.out.println("Please choose a valid option or tap 'q'.");
+                break;
+        }
+        return 0;
+    }
+
+    /**
+     * Graph Menu
+     * @return
+     */
     public static int grafMenu(){
         System.out.println("\n***** GRAPH MENU *****\nWhat do you want to do : ");
         System.out.println("- 1 - to interact with Nodes");
         System.out.println("- 2 - to interact with Edges");
         System.out.println("- 3 - to interact with DotFormat");
         System.out.println("- 4 - to print the graph in different ways");
+        System.out.println("- 5 - to access to the ChinesePostman Menu");
         System.out.println("- q - to stop\n\n");
         Scanner input = new Scanner(System.in);
         char choice = input.nextLine().charAt(0);
@@ -190,6 +292,8 @@ public class MyMain {
                 return dotMenu();
             case '4' :
                 return printMenu();
+            case '5' :
+                return ChinesePostmanMenu();
             case 'q' :
                 return -1;
             default:
@@ -257,14 +361,16 @@ public class MyMain {
         System.out.println(ung.toDotString());
         System.out.println(">>>> DFS of undirected graf: \n"+ung.getDFS());
         System.out.println(">>>> BFS of undirected graf: \n"+ung.getBFS());
+
         /******************************
          ******* Intercative menu *****
          *****************************/
+        ChinesePostman chinese=new ChinesePostman(ung);
         System.out.println("\n\n\nInteractive menu :\n\n");
         Scanner input = new Scanner(System.in);
         boolean activ_menu=true;
         boolean digraf=false;
-        Graf graf=null;
+
         int r=0;
         r=aff_creation_menu();
         switch (r){
@@ -423,6 +529,13 @@ public class MyMain {
                     break;
                 case 45 : //DFS
                     System.out.println("DFS : \n"+graf.getDFS().toString());
+                    break;
+
+                case -55 : //get graph from dot
+                    File f = new File(path);
+                    if(!(f.exists() && f.canRead())) {
+                        System.err.println("File doesn't exist, please retry\n");
+                    }
                     break;
 
                 case -1:

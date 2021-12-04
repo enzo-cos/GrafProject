@@ -171,6 +171,14 @@ public class TestChinese {
         List<Edge> l=g.getEulerianCircuit(true);
         System.out.println(l);
         System.out.println(g.toDotString());
+
+        f=new File("src/exempleFinal");
+         g=new ChinesePostman(f);
+         l=g.getEulerianCircuit(true);
+        System.out.println(l);
+        System.out.println(g.toDotString());
+
+        File ff=new File("src/Exgv");
     }
 
 }
