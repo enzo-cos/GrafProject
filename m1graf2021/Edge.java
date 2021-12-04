@@ -104,6 +104,7 @@ public class Edge implements Comparable<Edge>{
         if(obj instanceof Edge && this==obj) return true;
         Edge e= (Edge) obj;
         if(e.from.getId()!=this.from.getId() || e.to.getId()!=this.to.getId() ) return false;
+        if((e.weight!= null && this.weight!=null) && !e.weight.equals(this.weight)) return false;
         return true;
     }
     @Override

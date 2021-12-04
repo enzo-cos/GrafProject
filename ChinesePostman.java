@@ -11,7 +11,7 @@ public class ChinesePostman {
     private String optionDot;
     private String finalLabel;
     private final Map<Edge,ArrayList<String>> mapOptionsEdge;
-    private int nbEdgeAdded=0;
+    private int costEdgeAdded =0;
     private String typeGraf;
 
     /**
@@ -293,60 +293,55 @@ public class ChinesePostman {
      * @return list : list of edge of the circuit
      */
     public List<Edge> getEulerianCircuit(boolean random){
-        List<Edge> alledge=graf.getAllEdges();
-        List<Edge> list=new ArrayList<>();
-        List<Node> list_node=new ArrayList<>();
+        List<Edge> list_edge=new ArrayList<>();
+        String strCircuit="";
         int isEulerian=isEulerian();
         if(isEulerian==0){
             //Eulerian Graph
-            typeGraf="Eulerian Graph";
-            list_node= getEulerianCircuitNode();
+            typeGraf="Eulerian";
+            strCircuit="Eulerian circuit : ";
+            list_edge= getEulerianCircuitEdge();
         }else if(isEulerian==1){
             //Semi Eulerian Graph
-            typeGraf="Semi-Eulerian Graph";
+            typeGraf="Semi-Eulerian";
+            strCircuit="Eulerian trail : ";
             Node nfirst=getMinNodeOdd();
-            list_node=getSemiEulerianCircuitNode(nfirst);
+            list_edge= getSemiEulerianCircuitEdge(nfirst);
         }else if(isEulerian==-1){
             //Not Eulerian -> Chinese Postman problem
-            typeGraf="ChinesePostman";
+            typeGraf="Non-Eulerian";
+            strCircuit="Chinese circuit : ";
             Map<Pair<Node, Node>, Pair<Integer, Node>> map=Floyd_Warshall();
-            System.out.println(map);
+            System.out.println("Floyd_Warshall map : \n"+map);
             List<Pair<Node, Node>> listOfPair=getListPair(map,random);
-            System.out.println(listOfPair);
+            System.out.println("List of pairs used : \n"+listOfPair);
             duplicateEdge(map,listOfPair);
-            list_node=getEulerianCircuitNode();
+            list_edge= getEulerianCircuitEdge();
         }
-
-        Node curr=list_node.get(0);
-        int k=0;
         int totalLength=0;
-        String str="Type: "+typeGraf+"\nChinese circuit: [";
-        for(Node node: list_node){
-            if(k==0){
-                k++;
-                continue;
-            }
-            Edge e=getMinEdge(curr,node,alledge);
-            if(!e.from().equals(curr)) e=e.getSymmetric();
-            list.add(e);
+        String str="\nType: "+typeGraf+"\n"+strCircuit+" [";
+        for(Edge e: list_edge){
             totalLength+=e.getWeight();
             str=str.concat(e+" ");
-            curr=node;
-            k++;
         }
-        str+="]\nTotal length : "+totalLength+"\nExtraCost : "+nbEdgeAdded+"\n";
+        str=str.concat("]\nTotal length : "+totalLength+"\n");
+        if(isEulerian==-1) str=str.concat("ExtraCost : "+ costEdgeAdded +"\n");
         finalLabel=str;
-        return list;
+        return list_edge;
     }
 
     /**
      * Obtain Eulerian circuit from a graf
      * @return list Eulerian Circuit
      */
-    public List<Node> getEulerianCircuitNode(){
-        UndirectedGraf g=new UndirectedGraf(graf.toSuccessorArray());
-        List<Node> list=new LinkedList<>();
-        Node n=g.getNode(1);
+    public List<Edge> getEulerianCircuitEdge(){
+        UndirectedGraf g=new UndirectedGraf();
+        //Create copy
+        for(Edge e : graf.getAllEdges())
+            g.addEdge(e);
+
+        List<Edge> list=new LinkedList<>();
+        Node n=g.getNode(1); //Starting Node
         int ind=-1;
         list= getEulerian_rec(n,list,g,ind);
         return list;
@@ -360,39 +355,65 @@ public class ChinesePostman {
      * @param ind Indice to add a node into the list
      * @return Eulerian Circuit
      */
-    private List<Node> getEulerian_rec(Node n,List<Node> list,UndirectedGraf g,int ind){
-        if(ind==-1){
-            list.add(n);
-        }else{
-            list.add(ind,n);
-        }
-        if(ind!= -1) ind++;
+    private List<Edge> getEulerian_rec(Node n,List<Edge> list,UndirectedGraf g,int ind){
         Node nmin=getMinSuccessor(n,g);
+        boolean symetric=false;
         if(nmin==null){
-            for(Node n2 : list){
-                Node ncurr=this.getMinSuccessor(n2,g);
+            for(Edge e2 : list){
+                Node ncurr=this.getMinSuccessor(e2.to(),g);
                 if(ncurr!=null){
-                    g.removeEdge(n2, ncurr);
-                    n=ncurr;
-                    ind=list.indexOf(n2)+1;
-                    list=getEulerian_rec(n,list,g,ind);
+                    //get edge from the graph
+                    Edge e_curr=new Edge(e2.to(),ncurr);
+                    if(e_curr.from().getId()>e_curr.to().getId()){
+                        e_curr=e_curr.getSymmetric();
+                        symetric=true;
+                    }
+                    e_curr=g.getAllEdges().get(g.getAllEdges().indexOf(e_curr));
+                    if(symetric) e_curr=e_curr.getSymmetric();
+
+                    g.removeEdge(e_curr);
+                    ind=list.indexOf(e2)+1;
+                    list.add(ind,e_curr);
+                    ind++;
+                    list=getEulerian_rec(ncurr,list,g,ind);
                     break;
                 }
             }
         }else{
-            g.removeEdge(n,nmin);
-            list=getEulerian_rec(nmin,list,g,ind);
+            //Get edge from graph
+            Edge e_curr=new Edge(n,nmin);
+            if(e_curr.from().getId()>e_curr.to().getId()){
+                e_curr=e_curr.getSymmetric();
+                symetric=true;
+            }
+            e_curr=g.getAllEdges().get(g.getAllEdges().indexOf(e_curr));
+            if(symetric) e_curr=e_curr.getSymmetric();
+
+            g.removeEdge(e_curr);
+            if(ind==-1){
+                list.add(e_curr);
+            }else{
+                list.add(ind,e_curr);
+            }
+            if(ind!= -1) ind++;
+
+            list=getEulerian_rec(e_curr.to(),list,g,ind);
         }
+
 
         return list;
     }
 
     /**
      * Obtain Eulerian circuit from a graf
+     * @param nfirst Starting node
      * @return list Eulerian Circuit
      */
-    public List<Node> getSemiEulerianCircuitNode(Node nfirst){
-        UndirectedGraf g = (UndirectedGraf) graf.getGraf();
+    public List<Edge> getSemiEulerianCircuitEdge(Node nfirst){
+        UndirectedGraf g = new UndirectedGraf();
+        //Creat copy
+        for(Edge e : graf.getAllEdges())
+            g.addEdge(e);
         return getEulerian_rec(nfirst,new LinkedList<>(),g,-1);
     }
 
@@ -574,7 +595,6 @@ public class ChinesePostman {
                 dist+=map.get(_p).getFirst();
                 list_final.add(_p);
             }
-            //System.err.println("dist : "+dist);
             int nb_combinaison=list_Pair.size();
             for(int i=nb_pair;i<nb_combinaison;i+=nb_pair){
                 int dist2=0;
@@ -584,17 +604,11 @@ public class ChinesePostman {
                     list_curr.add(_p);
                     dist2+=map.get(_p).getFirst();
                 }
-                //System.err.println("dist : "+dist2);
-                //System.err.println(list_curr+"\n");
                 if(dist2<dist){
                     list_final=list_curr;
                     dist=dist2;
                 }
             }
-            /*System.err.println(list_final);
-            for(Pair p : list_final){
-                System.err.println(map.get(p).getFirst());
-            }*/
         }
 
         return list_final;
@@ -625,9 +639,9 @@ public class ChinesePostman {
             Edge e = new Edge(start,target,w);
             if(e.from().getId()>e.to().getId()) e=e.getSymmetric();
             graf.addEdge(e);
-            nbEdgeAdded++;
+            costEdgeAdded+=e.getWeight();
             ArrayList<String> list=new ArrayList<>();
-            list.add("color=green");list.add("fontcolor=green");
+            list.add("color=red");list.add("fontcolor=red");
             mapOptionsEdge.put(e, list);
             return;
         }

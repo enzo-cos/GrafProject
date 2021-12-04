@@ -41,10 +41,6 @@ public class TestChinese {
         System.out.println(graf.getGraf().toDotString());
         Assert.assertEquals(-1,graf.isEulerian());
 
-        f=new File("myGraf.gv");
-        graf=new ChinesePostman(f);
-        System.out.println(graf.toDotString());
-
         f=new File("src/exempleFinal");
         graf=new ChinesePostman(f);
         System.out.println(graf.toDotString());
@@ -56,25 +52,15 @@ public class TestChinese {
         UndirectedGraf g=new UndirectedGraf();
         ChinesePostman graf=new ChinesePostman(f);
         System.out.println(graf.toDotString());
-        int[] expect={1,2,3,4,5,3,2,4,1};
-        List<Node> list=graf.getEulerianCircuitNode();
+        List<Edge> list=graf.getEulerianCircuitEdge();
         System.out.println(list);
-        int i=0;
-        for(Node n : list){
-            Assert.assertEquals(expect[i],n.getId());
-            i++;
-        }
         //1 2 3 4 5 3 2 4 1
         f=new File("src/Eulerian2.gv");
         graf=new ChinesePostman(f);
         System.out.println(graf.toDotString());
         int[]expect2={1,2,3,6,5,7,8,9,10,8,6,2,4,1,4,5,1};
-        list=graf.getEulerianCircuitNode();
-        i=0;
-        for(Node n : list){
-            Assert.assertEquals(expect2[i],n.getId());
-            i++;
-        }
+        list=graf.getEulerianCircuitEdge();
+        System.out.println(list);
         // 1 2 3 6 5 7 8 9 10 8 6 2 4 1 4 5 1
     }
 
@@ -85,26 +71,16 @@ public class TestChinese {
         ChinesePostman graf=new ChinesePostman(f);
         Node n= graf.getMinNodeOdd();
         int[] expect={2,1,4,3,2,3,5,4};
-        List<Node> list=graf.getSemiEulerianCircuitNode(n);
+        List<Edge> list=graf.getSemiEulerianCircuitEdge(n);
         System.out.println(list);
-        int i=0;
-        for(Node node : list){
-            Assert.assertEquals(expect[i],node.getId());
-            i++;
-        }
         // 2 1 4 3 2 3 5 4
 
         f=new File("src/semi-Eulerian2.gv");
         graf=new ChinesePostman(f);
         n= graf.getMinNodeOdd();
         int[] expect2={3,2,1,4,5,2,7,3,5,7,6,4};
-        list=graf.getSemiEulerianCircuitNode(n);
+        list=graf.getSemiEulerianCircuitEdge(n);
         System.out.println(list);
-        i=0;
-        for(Node node : list){
-            Assert.assertEquals(expect2[i],node.getId());
-            i++;
-        }
         // 3 2 1 4 5 2 7 3 5 7 6 4
     }
 
@@ -136,12 +112,12 @@ public class TestChinese {
         System.out.println("list of pair : "+list);
         //graf.duplicateEdge
         for(Pair p : list){
-            System.out.println(map.get(p));
+            System.out.println(p+" -> "+map.get(p));
         }
         graf.duplicateEdge(map,list);
         //System.out.println(graf.toDotString());
-        System.out.println(graf.getEulerianCircuitNode());
-        // 3,5 9,10
+        System.out.println(graf.getEulerianCircuitEdge());
+        System.out.println(graf.toDotString());
     }
 
     @Test
@@ -159,26 +135,26 @@ public class TestChinese {
             System.out.println(map.get(p));
         }
         graf.duplicateEdge(map,list);
-        System.out.println(graf.getEulerianCircuitNode());
+        System.out.println(graf.getEulerianCircuitEdge());
         System.out.println(graf.toDotString());
-        // 3,5 9,10
     }
 
     @Test
     public void TestGeneral(){
         File f=new File("src/Exemple_TD.gv");
         ChinesePostman g=new ChinesePostman(f);
-        List<Edge> l=g.getEulerianCircuit(true);
-        System.out.println(l);
+        List<Edge> l=g.getEulerianCircuit(false);
+        System.out.println("Eulerian circuit : \n"+l);
+        //random false :  1->2  2->3  3->6  6->2   2->6   6->3   3->7   7->4   4->5   5->7   7->8   8->9   9->7  7->9   9->10  10->11  11->10  10->7   7->11   11->7  7->2  2->1  1->5  5->1
         System.out.println(g.toDotString());
 
         f=new File("src/exempleFinal");
          g=new ChinesePostman(f);
-         l=g.getEulerianCircuit(true);
-        System.out.println(l);
+        System.out.println(g.getEulerianCircuitEdge());
+         l=g.getEulerianCircuit(false);
+        System.out.println("Eulerian circuit : \n"+l);
         System.out.println(g.toDotString());
-
-        File ff=new File("src/Exgv");
+        //random false : 1->2  2->1  1->3 3->4 4->3 3->2 2->4 4->1
     }
 
 }

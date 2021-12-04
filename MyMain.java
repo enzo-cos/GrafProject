@@ -195,10 +195,10 @@ public class MyMain {
     public static int ChinesePostmanMenu(){
         System.out.println("\n***** CHINESEPOSTMAN MENU *****\nWhat do you want to do : ");
         System.out.println("- 0 - to init the problem with your actual graph");
-        System.out.println("- 1 - to get a graph from a dot File");
+        System.out.println("- 1 - to load a graph from a dot File");
         System.out.println("- 2 - to know if your graph is Eulerian, semi-Eulerian or not Eulerian");
-        System.out.println("- 3 - to resolve the ChinesePostman Problem and get the Eulerian circuit of your graph ");
-        System.out.println("- 4 - print your graph in a dotFile");
+        System.out.println("- 3 - to get the Eulerian circuit of your graph, (resolving the ChinesePostman Problem if needed) ");
+        System.out.println("- 4 - print your graph in the Dot format (do this after doing step '3')");
         System.out.println("- 5 - to extract your graph in a dot file");
         System.out.println("- q - to stop\n\n");
 
@@ -257,6 +257,7 @@ public class MyMain {
                 System.out.println(g.toDotString());
                 return ChinesePostmanMenu();
             case '5' :
+                System.out.println("Please write the name of the file\n");
                 String strr=input.nextLine();
                 g.toDotFile(strr);
                 return ChinesePostmanMenu();
