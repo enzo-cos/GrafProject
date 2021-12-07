@@ -7,13 +7,13 @@ import java.util.*;
  *****     PW3 PROJECT   ******
  *****************************/
 public class ChinesePostman {
-    private final UndirectedGraf graf;
-    private String optionDot;
-    private String finalLabel;
-    private final Map<Edge,ArrayList<String>> mapOptionsEdge;
-    private List<Edge> doublons;
-    private int costEdgeAdded =0;
-    private String typeGraf;
+    private final UndirectedGraf graf; //Graph used
+    private String optionDot; //option Dot
+    private String finalLabel; //label dot
+    private final Map<Edge,ArrayList<String>> mapOptionsEdge; //map to get options Dot of an edge
+    private List<Edge> doublons; //if we duplicate several times the same Edge
+    private int costEdgeAdded =0; //Cost of edges added
+    private String typeGraf; //Type of the graph
 
     /**
      * Constructor of Chinese Postman Problem
@@ -490,7 +490,7 @@ public class ChinesePostman {
                     mat[n1.getId()][n2.getId()]=0;
                     pred[n1.getId()][n2.getId()]=n1;
                 }else{
-                    //Comparer les multi edges et prendre le plus petit
+                    //Compare multi edges and take the one with the smallest weight
                     Edge e=getMinEdge(n1,n2,list_edge);
                     if(e!=null){
                         map.put(new Pair<>(n1,n2),new Pair<>(e.getWeight(),n1));
@@ -518,9 +518,13 @@ public class ChinesePostman {
                     }
                     int nb=res_xz.getFirst() + dist2;
                     if(res_xz.getFirst()!=INF && res_zy.getFirst()!=INF && (nb< res_xy.getFirst())){
-                        map.replace(xy,new Pair<>(nb,z));
+                        Node n_pre=pred[z.getId()][y.getId()];
+                        if(n_pre==null){ //because we passed in res_zy=map.get(zy.getRevserse())
+                            n_pre=pred[y.getId()][z.getId()];
+                        }
+                        map.replace(xy,new Pair<>(nb,n_pre));
                         mat[x.getId()][y.getId()]=nb;
-                        pred[x.getId()][y.getId()]=pred[z.getId()][y.getId()];
+                        pred[x.getId()][y.getId()]=n_pre;
                     }
                 }
             }

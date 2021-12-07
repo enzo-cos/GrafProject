@@ -1,18 +1,17 @@
 import m1graf2021.*;
 
 import java.io.File;
-import java.rmi.server.UnicastRemoteObject;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Scanner;
 
 public class MyMain {
     static ChinesePostman g=new ChinesePostman();
-    static Graf graf=null;
+    static UndirectedGraf graf=null;
     static String path="";
     /**
      * Display Graph's creation menu
-     * @return
+     * @return number
      */
     public static int aff_creation_menu(){
         System.out.println("\n***** GRAPH CREATION *****\nChoose what kind of graph you want to create : ");
@@ -37,7 +36,7 @@ public class MyMain {
 
     /**
      * Display Node's menu
-     * @return
+     * @return int to get the result
      */
     public static int nodeMenu(){
         System.out.println("\n***** NODES MENU *****\nWhat do you want to do  : ");
@@ -49,7 +48,7 @@ public class MyMain {
         System.out.println("- 6 - to return to graph menu");//15
         System.out.println("- q - to stop\n\n");
         Scanner input = new Scanner(System.in);
-        while (1==1) {
+        while (true) {
             char choice = input.nextLine().charAt(0);
             switch (choice) {
                 case '1':
@@ -75,7 +74,7 @@ public class MyMain {
 
     /**
      * Display Edge's Menu
-     * @return
+     * @return int to get the result
      */
     public static int edgeMenu(){
         System.out.println("\n***** EDGES MENU *****\nWhat do you want to do  : ");
@@ -86,7 +85,7 @@ public class MyMain {
         System.out.println("- 5 - to return to graph menu");//24
         System.out.println("- q - to stop\n\n");
         Scanner input = new Scanner(System.in);
-        while (1==1) {
+        while (true) {
             char choice = input.nextLine().charAt(0);
             switch (choice) {
                 case '1':
@@ -110,7 +109,7 @@ public class MyMain {
 
     /**
      * Display Dot Menu
-     * @return
+     * @return int to get the result
      */
     public static int dotMenu(){
         System.out.println("\n***** DOT MENU *****\nWhat do you want to do  : ");
@@ -138,7 +137,7 @@ public class MyMain {
 
     /**
      * Display print Menu
-     * @return
+     * @return int to get the result
      */
     public static int printMenu(){
         System.out.println("\n***** PRINT MENU *****\nWhat do you want to do  : ");
@@ -179,7 +178,6 @@ public class MyMain {
 
     /**
      * Display print Menu
-     * @return
      */
     public static void dotFile(){
         System.out.println("\n***** Get a Graph from a Dot File *****\n\nwrite the path to your dot file : \nTap ENTER to validate\n\n");
@@ -190,7 +188,7 @@ public class MyMain {
 
     /**
      * ChinesePostmanMenu
-     * @return
+     * @return int to get the result
      */
     public static int ChinesePostmanMenu(){
         System.out.println("\n***** CHINESEPOSTMAN MENU *****\nWhat do you want to do : ");
@@ -223,16 +221,16 @@ public class MyMain {
                     }
                     try {
                         g=new ChinesePostman(f);
+                        System.out.println("\nGraph has been successfully loaded");
                     }catch (Exception e){
                         System.err.println("invalide file");
                         return ChinesePostmanMenu();
                     }
 
                 }catch (Exception e){
-                    System.err.println("Invalide path\nPlease Retry\n");
-                }finally {
-                    return ChinesePostmanMenu();
+                    System.err.println("Invalide path\nPlease Retry");
                 }
+                return ChinesePostmanMenu();
 
             case '2' : //Graph Eulerian or not
                 int n=g.isEulerian();
@@ -248,10 +246,13 @@ public class MyMain {
                 return ChinesePostmanMenu();
             case '3' :
                 boolean b=false;
-                System.out.println("Do you want to compute the ChineseProblem with random Pair ?\ny for Yes     n for No\n");
-                choice = input.nextLine().charAt(0);
-                if(choice=='y') b=true;
+                if(g.isEulerian()==-1) {
+                    System.out.println("The graph is not Eulerian.\nDo you want to compute the ChineseProblem with random Pair ?\ny for Yes     n for No\n");
+                    choice = input.nextLine().charAt(0);
+                    if (choice == 'y') b = true;
+                }
                 List<Edge> l=g.getEulerianCircuit(b);
+                System.out.println("Eulerian Circuit : \n"+l);
                 return ChinesePostmanMenu();
             case '4' : //print dotFile
                 System.out.println(g.toDotString());
@@ -272,7 +273,7 @@ public class MyMain {
 
     /**
      * Graph Menu
-     * @return
+     * @return int to get the result
      */
     public static int grafMenu(){
         System.out.println("\n***** GRAPH MENU *****\nWhat do you want to do : ");
@@ -311,10 +312,10 @@ public class MyMain {
         System.out.println("\n\n\nInteractive menu :\n\n");
         Scanner input = new Scanner(System.in);
         boolean activ_menu=true;
-        boolean digraf=false;
-
+       // boolean digraf=false;
+        graf=new UndirectedGraf();
         int r=0;
-        r=aff_creation_menu();
+        /*r=aff_creation_menu();
         switch (r){
             case 0:
                 System.out.println("Time");
@@ -331,7 +332,7 @@ public class MyMain {
                 activ_menu=false;
                 System.out.println("\nClosing menu\n");
                 return ;
-        }
+        }*/
         String choice="";
         int nb=-1;
         int nb1=-1;int nb2=-1;
@@ -486,9 +487,6 @@ public class MyMain {
             }
         }
         return ;
-
-
-
 
 
 
