@@ -304,69 +304,10 @@ public class MyMain {
         return 0;
     }
     public static void main(String[] args) throws Exception {
-        //create new Graf with 7 nodes and 15 edges
-        Graf g = new Graf(2, 3, 5, 0, 4, 1, 0, 4, 5, 7, 0,6,7 ,0, 4, 7, 0, 3,2, 0, 1, 0);
-        System.out.println(g.nbNodes());
-        System.out.println(g.nbEdges());
-        //add and node and edges
-        g.addNode(8);
-        g.addEdge(5,8);g.addEdge(1,8);
-        //remove node
-        g.removeNode(7);
-        g.removeEdge(1,5);
-        //15 edges + 2 edges - all edges associated to node 7 - 1 = 12
-        System.out.println(g.nbEdges());
-        //Get the list of OutEdge of Node 1 : 1->2, 1->3, 1->8
-        System.out.println(g.getOutEdges(1));
-        //Get the matrix and Successor Array
-        System.out.println("Matrice :");
-        int[][] mat=g.toAdjMatrix();
-        for(int a = 0;a<mat.length;a++) {
-            System.out.println(Arrays.toString(mat[a]));
-        }
-        System.out.println("\n Successor Array :\n"+Arrays.toString(g.toSuccessorArray()));
-
-        System.out.println("Get the reverse graph");
-        System.out.println(g.getReverse().toDotString());
-        System.out.println("Get the transitive closure");
-        System.out.println(g.getTransitiveClosure().toDotString());
-        //We can also get the dot format
-        System.out.println(g.toDotString());
-        //Or directly get a file
-        g.toDotFile("myGraf");
-        System.out.println(">>>> DFS of graf: \n"+g.getDFS());
-        System.out.println(">>>> BFS of graf: \n"+g.getBFS());
-
-        //create empty Undirected Graf
-        UndirectedGraf ung=new UndirectedGraf();
-
-        for(int k=1;k<5;k++){
-            Node n=new Node(k);
-            ung.addNode(n);
-        }
-        ung.addEdge(1,2);ung.addEdge(1,3);ung.addEdge(2,4);ung.addEdge(4,5);
-        ung.addEdge(2,3);ung.addEdge(3,1);ung.addEdge(3,2);
-        //5 nodes and 7 edges
-        System.out.println(ung.nbNodes());
-        System.out.println(ung.nbEdges());
-        //Get the list of Out Edges of Node 1 : 1->2, 1->3, 1->3
-        System.out.println(ung.getOutEdges(1));
-        //Get the matrix and Successor Array
-        System.out.println("Matrice :");
-        mat=ung.toAdjMatrix();
-        for(int a = 0;a<mat.length;a++) {
-            System.out.println(Arrays.toString(mat[a]));
-        }
-        System.out.println("\n Successor Array :\n"+Arrays.toString(ung.toSuccessorArray()));
-        //We can also get the dot format
-        System.out.println(ung.toDotString());
-        System.out.println(">>>> DFS of undirected graf: \n"+ung.getDFS());
-        System.out.println(">>>> BFS of undirected graf: \n"+ung.getBFS());
 
         /******************************
          ******* Intercative menu *****
          *****************************/
-        ChinesePostman chinese=new ChinesePostman(ung);
         System.out.println("\n\n\nInteractive menu :\n\n");
         Scanner input = new Scanner(System.in);
         boolean activ_menu=true;

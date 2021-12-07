@@ -2,6 +2,8 @@ import org.junit.Assert;
 import org.junit.jupiter.api.Test;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -141,7 +143,7 @@ public class TestChinese {
 
     @Test
     public void TestGeneral(){
-        File f=new File("src/Exemple_TD.gv");
+        File f=new File("src/NotEulerianTD.gv");
         ChinesePostman g=new ChinesePostman(f);
         List<Edge> l=g.getEulerianCircuit(false);
         System.out.println("Eulerian circuit : \n"+l);

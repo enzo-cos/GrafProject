@@ -11,6 +11,7 @@ public class ChinesePostman {
     private String optionDot;
     private String finalLabel;
     private final Map<Edge,ArrayList<String>> mapOptionsEdge;
+    private List<Edge> doublons;
     private int costEdgeAdded =0;
     private String typeGraf;
 
@@ -23,6 +24,7 @@ public class ChinesePostman {
         finalLabel="";
         mapOptionsEdge=new HashMap<>();
         typeGraf="";
+        doublons=new ArrayList<>();
     }
 
     /**
@@ -35,6 +37,7 @@ public class ChinesePostman {
         finalLabel="";
         typeGraf="";
         mapOptionsEdge=new HashMap<>();
+        doublons=new ArrayList<>();
     }
 
     /**
@@ -47,6 +50,7 @@ public class ChinesePostman {
         finalLabel="";
         typeGraf="";
         mapOptionsEdge=new HashMap<>();
+        doublons=new ArrayList<>();
         if (!fich.exists()){
             throw new RuntimeException("File doesn't exist");
         }
@@ -180,7 +184,11 @@ public class ChinesePostman {
                     for(String s : list) {
                         optEdge =optEdge.concat("," + s);
                     }
-                    mapOptionsEdge.remove(e);
+                    if(doublons.contains(e)){
+                        doublons.remove(e);
+                    }else {
+                        mapOptionsEdge.remove(e);
+                    }
                 }
                 if(new_l) str=str.concat("\t"+nb+" -- ");
                 if(e.getWeight()!=null){
@@ -231,7 +239,9 @@ public class ChinesePostman {
     private void addOptionsEdge(String str, Edge e){
 
         if(str.contains("color")){
+            if(mapOptionsEdge.containsKey(e)) doublons.add(e);
             mapOptionsEdge.put(e,new ArrayList<>());
+
             if(str.contains("]")){
                 str=str.substring(str.indexOf("[")+1);
                 if(str.contains("]"))  str=str.substring(0,str.indexOf("]"));
@@ -476,14 +486,14 @@ public class ChinesePostman {
         for(Node n1 : list_node){
             for(Node n2 : list_node){
                 if(n1.equals(n2)){
-                    map.put(new Pair<>(n1,n2),new Pair<>(0,null));
+                    map.put(new Pair<>(n1,n2),new Pair<>(0,n1));
                     mat[n1.getId()][n2.getId()]=0;
                     pred[n1.getId()][n2.getId()]=n1;
                 }else{
                     //Comparer les multi edges et prendre le plus petit
                     Edge e=getMinEdge(n1,n2,list_edge);
                     if(e!=null){
-                        map.put(new Pair<>(n1,n2),new Pair<>(e.getWeight(),null));
+                        map.put(new Pair<>(n1,n2),new Pair<>(e.getWeight(),n1));
                         mat[n1.getId()][n2.getId()]=e.getWeight();
                         pred[n1.getId()][n2.getId()]=n1;
                     }else{
@@ -634,7 +644,7 @@ public class ChinesePostman {
         Node start= pair.getFirst();
         Node target= pair.getSecond();
         Node pass=map.get(pair).getSecond();
-        if(pass==null){
+        if(pass.equals(start)){
             int w =getMinEdge(start,target,graf.getAllEdges()).getWeight();
             Edge e = new Edge(start,target,w);
             if(e.from().getId()>e.to().getId()) e=e.getSymmetric();
@@ -642,7 +652,9 @@ public class ChinesePostman {
             costEdgeAdded+=e.getWeight();
             ArrayList<String> list=new ArrayList<>();
             list.add("color=red");list.add("fontcolor=red");
-            mapOptionsEdge.put(e, list);
+            if(mapOptionsEdge.put(e, list)!=null){
+                doublons.add(e);
+            }
             return;
         }
         Pair<Node,Node> p2=new Pair<>(pass,target);
