@@ -104,7 +104,7 @@ public class TestChinese {
     @Test
     public void testTD(){
         UndirectedGraf g=new UndirectedGraf();
-        File f=new File("src/Exemple_TD.gv");
+        File f=new File("src/NotEulerianTD.gv");
         ChinesePostman graf=new ChinesePostman(f);
         // 3 5 9 10
         // 3,5 9,10 =12    3,9 5,10 =16      3,10 5,9 = 15
@@ -157,6 +157,32 @@ public class TestChinese {
         System.out.println("Eulerian circuit : \n"+l);
         System.out.println(g.toDotString());
         //random false : 1->2  2->1  1->3 3->4 4->3 3->2 2->4 4->1
+    }
+
+    @Test
+    public void TestNotEulerian2(){
+        File f = new File("src/notEulerian2.gv");
+        ChinesePostman g=new ChinesePostman(f);
+        System.out.println(g.isEulerian());
+        List<Edge> l=g.getEulerianCircuit(false);
+        System.out.println(g.toDotString());
+    }
+    @Test
+    public void TestSemiEulerianBig(){
+        File f = new File("src/Semi_EulerianBig.gv");
+        ChinesePostman g=new ChinesePostman(f);
+        System.out.println(g.isEulerian());
+        List<Edge> l=g.getEulerianCircuit(false);
+        System.out.println(g.toDotString());
+    }
+
+    @Test
+    public void TestEulerianBig(){
+        File f = new File("src/EulerianBig.gv");
+        ChinesePostman g=new ChinesePostman(f);
+        System.out.println(g.isEulerian());
+        List<Edge> l=g.getEulerianCircuit(false);
+        System.out.println(g.toDotString());
     }
 
 }
