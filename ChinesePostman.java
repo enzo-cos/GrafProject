@@ -10,7 +10,7 @@ public class ChinesePostman {
     private final UndirectedGraf graf; //Graph used
     private String optionDot; //option Dot
     private String finalLabel; //label dot
-    private final Map<Edge,ArrayList<String>> mapOptionsEdge; //map to get options Dot of an edge
+    private Map<Edge,ArrayList<String>> mapOptionsEdge; //map to get options Dot of an edge
     private List<Edge> doublons; //if we duplicate several times the same Edge
     private int costEdgeAdded =0; //Cost of edges added
     private String typeGraf; //Type of the graph
@@ -102,7 +102,6 @@ public class ChinesePostman {
                             String str_2=tab_str[1];
 
                             if(str_2.contains("[")){ //Ex : 1-- 1[len=4,label="4"];
-                                //+ de Précisions : rechercher dans tab_str[0] .split l'élément contenant le len et faire indice+1
                                 int ind=str_2.indexOf("[");
                                 int to=Integer.parseInt(str_2.substring(0,ind).trim());
                                 if(str_2.contains("len")) {
@@ -143,7 +142,6 @@ public class ChinesePostman {
                         }
                     }
                 }catch (NumberFormatException e){
-                    //System.err.println(e);
                 }
             }
         }catch (IOException e) {
@@ -156,6 +154,8 @@ public class ChinesePostman {
      * @return Dot Format
      */
     public String toDotString(){
+        Map<Edge,ArrayList<String>> mapOption_curr=new HashMap<>(mapOptionsEdge);
+        List<Edge> doublon_curr=new ArrayList<>(doublons);
         String str="";
         str=str.concat("graph {\n");
         if(!optionDot.isEmpty()){
@@ -179,15 +179,15 @@ public class ChinesePostman {
             boolean new_l=true; //Know if we have to put a "," and know if it's a new line or not
             for(Edge e : list_edges){
                 String optEdge="";
-                ArrayList<String> list=mapOptionsEdge.get(e);
+                ArrayList<String> list=mapOption_curr.get(e); // if edge have options
                 if(list!=null && !list.isEmpty()){
                     for(String s : list) {
                         optEdge =optEdge.concat("," + s);
                     }
-                    if(doublons.contains(e)){
-                        doublons.remove(e);
+                    if(doublon_curr.contains(e)){
+                        doublon_curr.remove(e);
                     }else {
-                        mapOptionsEdge.remove(e);
+                        mapOption_curr.remove(e);
                     }
                 }
                 if(new_l) str=str.concat("\t"+nb+" -- ");
@@ -270,15 +270,14 @@ public class ChinesePostman {
         }
         if(nbOddDegree==0) return 0;//Eulerian
         if(nbOddDegree==2) return 1;//Semi-Eulerian
-        //if(nbOddDegree>2) return -1;//Not Eulerian
         return -1;
     }
 
     /**
-     * Get the smallest of the node
+     * Get the smallest successor of the node
      * @param n Node we are looking for his smallest successor
-     * @param g copy of the graf
-     * @return node
+     * @param g The graf
+     * @return smallest node successor
      */
     public Node getMinSuccessor(Node n, UndirectedGraf g){
         if(g==null) return null;
@@ -647,8 +646,9 @@ public class ChinesePostman {
     public void duplicateEdgeRec(Map<Pair<Node,Node>,Pair<Integer,Node>> map,Pair<Node,Node> pair){
         Node start= pair.getFirst();
         Node target= pair.getSecond();
-        Node pass=map.get(pair).getSecond();
-        if(pass.equals(start)){
+        Node pred=map.get(pair).getSecond();
+        //if it's a direct liaison
+        if(pred.equals(start)){
             int w =getMinEdge(start,target,graf.getAllEdges()).getWeight();
             Edge e = new Edge(start,target,w);
             if(e.from().getId()>e.to().getId()) e=e.getSymmetric();
@@ -661,9 +661,9 @@ public class ChinesePostman {
             }
             return;
         }
-        Pair<Node,Node> p2=new Pair<>(pass,target);
+        Pair<Node,Node> p2=new Pair<>(pred,target);
         duplicateEdgeRec(map,p2);
-        Pair<Node,Node> p=new Pair<>(start,pass);
+        Pair<Node,Node> p=new Pair<>(start,pred);
         duplicateEdgeRec(map,p);
     }
 
