@@ -328,10 +328,16 @@ public class ChinesePostman {
             list_edge= getEulerianCircuitEdge();
         }
         int totalLength=0;
-        String str="\nType: "+typeGraf+"\n"+strCircuit+" [";
+        String str="\nType: "+typeGraf+"\n"+strCircuit+"\n [";
+        int k=0;
         for(Edge e: list_edge){
+            if(k==5){
+                k=0;
+                str=str.concat("\n");
+            }
             totalLength+=e.getWeight();
             str=str.concat(e+" ");
+            k++;
         }
         str=str.concat("]\nTotal length : "+totalLength+"\n");
         if(isEulerian==-1) str=str.concat("ExtraCost : "+ costEdgeAdded +"\n");
